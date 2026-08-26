@@ -8,3 +8,4 @@ curl -v http://192.168.1.115:8081/zeroconf/info -H "Content-Type: application/js
 
 # LITE!
 curl -F "firmware=@.pio/build/dev/firmware.bin" "http://192.168.1.225/api/ota_flash?tamanho=$(stat -c%s .pio/build/dev/firmware.bin)"
+curl -F "firmware=@.pio/build/sonoff-mini/firmware.bin" "http://192.168.1.94/api/ota_flash?tamanho=$(stat -c%s .pio/build/sonoff-mini/firmware.bin)"
