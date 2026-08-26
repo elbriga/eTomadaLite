@@ -4,16 +4,21 @@
 #include <EEPROM.h>
 #include <Updater.h>
 
-#define ETOMADA_LITE_VERSAO "0.0.4"
+#include "eTomadaLite.h"
+#include "loga.h"
 
-#define ETOMADA_LITE_DEVICE_ID "MINI01" // TODO : config
-#define ETOMADA_LITE_DEVICE_MODEL "MINI"
-#define ETOMADA_LITE_DEVICE_BOARD "esp01_1m"
+#define ETOMADA_LITE_VERSAO "0.0.7"
+// 0.0.6 - led por TS
+// 0.0.7 - logaM e log remoto
+
+// Função de log para esta modulo
+#define logaM(nivel, fmt, ...) loga(".MAIN..", nivel, fmt, ##__VA_ARGS__)
+
+void logaProcessa();
 
 // ============================================================
 // Configuração
 // ============================================================
-
 #define EEPROM_SIZE 256
 #define CONFIG_MAGIC 0x45544F4DUL // "ETOM"
 
@@ -44,9 +49,7 @@ void configDefaults()
   memset(&config, 0, sizeof(config));
 
   config.magic = CONFIG_MAGIC;
-  strlcpy(config.hostname,
-          "etomada-lite",
-          sizeof(config.hostname));
+  strlcpy(config.hostname, "etomada-lite", sizeof(config.hostname));
 }
 
 bool configLoad()
@@ -56,14 +59,14 @@ bool configLoad()
   EEPROM.get(0, config);
   if (config.magic != CONFIG_MAGIC)
   {
-    Serial.println("Configuracao inexistente.");
+    logaM(LOG_AVISO, "Configuracao inexistente.");
     configDefaults();
     return false;
   }
 
-  Serial.println("Configuracao carregada.");
-  Serial.printf("SSID: %s\n", config.ssid);
-  Serial.printf("Hostname: %s\n", config.hostname);
+  logaM(LOG_NORMAL, "Configuracao carregada.");
+  logaM(LOG_NORMAL, "SSID: %s", config.ssid);
+  logaM(LOG_NORMAL, "Hostname: %s", config.hostname);
 
   return true;
 }
@@ -71,9 +74,13 @@ bool configLoad()
 void configSave()
 {
   EEPROM.put(0, config);
-  EEPROM.commit();
+  if (!EEPROM.commit())
+  {
+    logaM(LOG_CRITICO, "Erro ao salvar configuracao!");
+    return;
+  }
 
-  Serial.println("Configuracao salva.");
+  logaM(LOG_NORMAL, "Configuracao salva.");
 }
 
 // ============================================================
@@ -86,7 +93,7 @@ void releSet(bool ligado)
 
   digitalWrite(RELE_GPIO, ligado);
 
-  Serial.printf("Rele: %s\n", ligado ? "ON" : "OFF");
+  logaM(LOG_NORMAL, "Rele: %s", ligado ? "ON" : "OFF");
 }
 
 // ============================================================
@@ -99,24 +106,24 @@ void wifiStartAP()
 
   apName += String(ESP.getChipId(), HEX);
 
-  Serial.printf("Iniciando AP: %s\n", apName.c_str());
+  logaM(LOG_AVISO, "Iniciando AP: %s", apName.c_str());
 
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAP(apName.c_str());
 
-  Serial.printf("AP IP: %s\n", WiFi.softAPIP().toString().c_str());
+  logaM(LOG_AVISO, "AP IP: %s", WiFi.softAPIP().toString().c_str());
 }
 
 void wifiConnect()
 {
   if (config.ssid[0] == '\0')
   {
-    Serial.println("Nenhuma rede WiFi configurada.");
+    logaM(LOG_NORMAL, "Nenhuma rede WiFi configurada.");
     wifiStartAP();
     return;
   }
 
-  Serial.printf("Conectando em: %s\n", config.ssid);
+  logaM(LOG_NORMAL, "Conectando em: %s", config.ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.hostname(config.hostname);
@@ -132,12 +139,12 @@ void wifiConnect()
 
   if (WiFi.status() == WL_CONNECTED)
   {
-    Serial.printf("WiFi conectado!\n");
-    Serial.printf("IP: %s\n", WiFi.localIP().toString().c_str());
+    logaM(LOG_NORMAL, "WiFi conectado!");
+    logaM(LOG_NORMAL, "IP: %s", WiFi.localIP().toString().c_str());
   }
   else
   {
-    Serial.println("Falha ao conectar.");
+    logaM(LOG_AVISO, "Falha ao conectar.");
     wifiStartAP();
   }
 }
@@ -151,15 +158,17 @@ void apiGetSnapshot()
 
   resposta.reserve(256);
 
-  resposta = F("{\"fw_version\":\"");
+  resposta = F("{\"device\":\"eTomada\",");
+
+  resposta += F("\"fw_version\":\"");
   resposta += ETOMADA_LITE_VERSAO;
 
   resposta += F("\",\"device_id\":\"");
-  resposta += String(ETOMADA_LITE_DEVICE_ID);
+  resposta += eTomadaLiteDeviceID();
   resposta += F("\",\"device_model\":\"");
-  resposta += String(ETOMADA_LITE_DEVICE_MODEL);
+  resposta += eTomadaLiteDeviceModel();
   resposta += F("\",\"device_board\":\"");
-  resposta += String(ETOMADA_LITE_DEVICE_BOARD);
+  resposta += eTomadaLiteDeviceBoard();
 
   resposta += F("\",\"uptime\":");
   resposta += millis();
@@ -258,17 +267,14 @@ void apiOtaFlash()
 
     if (!server.hasArg("tamanho"))
     {
-      Serial.println("OTA: parametro tamanho ausente");
+      logaM(LOG_AVISO, "OTA: parametro tamanho ausente");
       otaErroMsg = "parametro tamanho ausente";
       return;
     }
 
     otaTamanhoEsperado = server.arg("tamanho").toInt();
 
-    Serial.printf(
-        "OTA iniciando: %s (%u bytes)\n",
-        upload.filename.c_str(),
-        otaTamanhoEsperado);
+    logaM(LOG_NORMAL, "OTA iniciando: %s (%u bytes)", upload.filename.c_str(), otaTamanhoEsperado);
 
     if (otaTamanhoEsperado == 0)
     {
@@ -279,18 +285,14 @@ void apiOtaFlash()
     if (otaTamanhoEsperado > ESP.getFreeSketchSpace())
     {
       otaErroMsg = "firmware grande demais";
-      Serial.printf(
-          "OTA: tamanho=%u free=%u\n",
-          otaTamanhoEsperado,
-          ESP.getFreeSketchSpace());
-
+      logaM(LOG_NORMAL, "OTA: tamanho=%u free=%u\n", otaTamanhoEsperado, ESP.getFreeSketchSpace());
       return;
     }
 
     if (!Update.begin(otaTamanhoEsperado))
     {
       otaErroMsg = "Update.begin falhou";
-      Serial.println("OTA: Update.begin falhou");
+      logaM(LOG_AVISO, "OTA: Update.begin falhou");
       Update.printError(Serial);
       return;
     }
@@ -310,7 +312,7 @@ void apiOtaFlash()
     if (gravado != upload.currentSize)
     {
       otaErroMsg = "erro ao gravar";
-      Serial.println("OTA: erro ao gravar");
+      logaM(LOG_CRITICO, "OTA: erro ao gravar");
       Update.printError(Serial);
     }
   }
@@ -320,38 +322,31 @@ void apiOtaFlash()
     if (otaErroMsg != nullptr)
       return;
 
-    Serial.printf("\nOTA recebido: %u bytes\n", upload.totalSize);
+    logaM(LOG_AVISO, "OTA recebido: %u bytes", upload.totalSize);
 
     if (upload.totalSize != otaTamanhoEsperado)
     {
+      logaM(LOG_AVISO, "OTA: esperado=%u recebido=%u\n", otaTamanhoEsperado, upload.totalSize);
       otaErroMsg = "tamanho recebido diferente";
-
-      Serial.printf(
-          "OTA: esperado=%u recebido=%u\n",
-          otaTamanhoEsperado,
-          upload.totalSize);
-
       Update.end();
       return;
     }
 
     if (!Update.end(true))
     {
+      logaM(LOG_AVISO, "OTA: Update.end falhou");
       otaErroMsg = "Update.end falhou";
-
-      Serial.println("OTA: Update.end falhou");
       Update.printError(Serial);
       return;
     }
 
-    Serial.println("OTA concluido!");
+    logaM(LOG_AVISO, "OTA concluido!");
   }
 
   else if (upload.status == UPLOAD_FILE_ABORTED)
   {
-    Serial.println("\nOTA abortado");
+    logaM(LOG_AVISO, "OTA abortado");
     otaErroMsg = "upload abortado";
-
     if (Update.isRunning())
       Update.end();
   }
@@ -360,6 +355,28 @@ void apiOtaFlash()
 // ============================================================
 // Web server
 // ============================================================
+void apiOtaFlashHelper()
+{
+  if (otaErroMsg != nullptr)
+  {
+    String resposta = "{\"ok\":false,\"msg\":\"";
+    resposta += otaErroMsg;
+    resposta += "\"}";
+
+    server.send(400, "application/json", resposta);
+    return;
+  }
+
+  server.send(200, "application/json", R"({"ok":true,"msg":"ota ok > restart"})");
+  delay(500);
+  ESP.restart();
+}
+
+void webRoot()
+{
+  server.send(200, "text/plain", "eTomada Lite");
+}
+
 void webInit()
 {
   server.on("/api/getSnapshot", HTTP_GET, apiGetSnapshot);
@@ -368,30 +385,13 @@ void webInit()
 
   server.on("/api/setRele", HTTP_GET, apiSetRele);
 
-  server.on("/api/ota_flash", HTTP_POST, []()
-            {
-        if (otaErroMsg != nullptr)
-        {
-          String resposta = "{\"ok\":false,\"msg\":\"";
-          resposta += otaErroMsg;
-          resposta += "\"}";
+  server.on("/api/ota", HTTP_POST, apiOtaFlashHelper, apiOtaFlash);
 
-          server.send(400, "application/json", resposta);
-          return;
-        }
-
-        server.send(200, "application/json", R"({"ok":true,"msg":"ota ok > restart"})");
-        delay(500);
-        ESP.restart(); },
-
-            apiOtaFlash);
-
-  server.on("/", HTTP_GET, []()
-            { server.send(200, "text/plain", "eTomada Lite"); });
+  server.on("/", HTTP_GET, webRoot);
 
   server.begin();
 
-  Serial.println("HTTP server iniciado.");
+  logaM(LOG_NORMAL, "HTTP server iniciado.");
 }
 
 // ============================================================
@@ -403,21 +403,24 @@ void setup()
 
   delay(100);
 
+  logaInit();
+
   Serial.println();
   Serial.println();
-  Serial.println("==============================");
-  Serial.println("       eTomada Lite");
-  Serial.println("==============================");
+  logaM(LOG_NORMAL, "==============================");
+  logaM(LOG_NORMAL, "       eTomada Lite");
+  logaM(LOG_NORMAL, "==============================");
 
-  Serial.printf("Versao: %s\n", ETOMADA_LITE_VERSAO);
+  logaM(LOG_NORMAL, "Versao: %s", ETOMADA_LITE_VERSAO);
 
-  Serial.printf("Chip ID: %08X\n", ESP.getChipId());
-  Serial.printf("Flash: %u bytes\n", ESP.getFlashChipSize());
-  Serial.printf("Sketch: %u bytes\n", ESP.getSketchSize());
-  Serial.printf("Free sketch: %u bytes\n", ESP.getFreeSketchSpace());
+  logaM(LOG_NORMAL, "Chip ID: %08X", ESP.getChipId());
+  logaM(LOG_NORMAL, "Flash: %u bytes", ESP.getFlashChipSize());
+  logaM(LOG_NORMAL, "Sketch: %u bytes", ESP.getSketchSize());
+  logaM(LOG_NORMAL, "Free sketch: %u bytes", ESP.getFreeSketchSpace());
 
   // Hardware
-  pinMode(LED_GPIO, OUTPUT);
+  pinMode(LED_GPIO, OUTPUT);   // Led Azul do MINI
+  digitalWrite(LED_GPIO, LOW); // LOW = Aceso!
   pinMode(RELE_GPIO, OUTPUT);
   releSet(false);
 
@@ -425,24 +428,30 @@ void setup()
   wifiConnect();
   webInit();
 
-  Serial.println("Inicializacao concluida.");
+  logaM(LOG_NORMAL, "Inicializacao concluida.");
 }
 
 bool ledState;
-unsigned long ledTimer = 0;
 void ledProcessa()
 {
-  if (millis() - ledTimer < 500)
-    return;
+  // Sincronizado com o segundo!
+  struct timeval tv;
+  gettimeofday(&tv, nullptr);
 
-  ledTimer = millis();
-  ledState = !ledState;
-  digitalWrite(LED_GPIO, ledState);
+  bool estado = tv.tv_usec > 100000;
+
+  if (estado != ledState)
+  {
+    ledState = estado;
+    digitalWrite(LED_GPIO, ledState);
+  }
 }
 
 void loop()
 {
   server.handleClient();
+
+  logaProcessa();
 
   ledProcessa();
 
