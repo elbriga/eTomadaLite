@@ -3,16 +3,19 @@
 
 #include "loga.h"
 #include "rele.h"
+#include "hardwareProfile.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".RELE..", nivel, fmt, ##__VA_ARGS__)
 
 extern ESP8266WebServer server;
+extern const HardwareProfile hardwareProfile;
+
 bool releLigado = false;
 
 void releInit()
 {
-  pinMode(RELE_GPIO, OUTPUT);
+  pinMode(hardwareProfile.relePin, OUTPUT);
   releSet(false);
 }
 
@@ -20,7 +23,7 @@ void releSet(bool ligado)
 {
   releLigado = ligado;
 
-  digitalWrite(RELE_GPIO, ligado);
+  digitalWrite(hardwareProfile.relePin, ligado);
 
   logaM(LOG_NORMAL, "Rele: %s", ligado ? "ON" : "OFF");
 }
