@@ -3,6 +3,7 @@
 
 #include "eTomadaLite.h"
 #include "loga.h"
+#include "util.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..OTA..", nivel, fmt, ##__VA_ARGS__)
@@ -121,6 +122,6 @@ void apiOtaFlashHelper()
   }
 
   server.send(200, "application/json", R"({"ok":true,"msg":"ota ok > restart"})");
-  delay(500);
-  ESP.restart();
+
+  utilRestart();
 }
