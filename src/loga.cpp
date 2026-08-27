@@ -64,7 +64,7 @@ static bool logQueuePush(const LogRemoto &log)
     logQueueInicio = (logQueueInicio + 1) % LOG_QUEUE_SIZE;
     logQueueQuantidade--;
 
-    logaM(LOG_AVISO, "Fila de logs cheia, descartando log antigo.");
+    Serial.println("Fila de logs cheia, descartando log antigo.");
   }
 
   logQueue[logQueueFim] = log;
@@ -179,28 +179,34 @@ void logaTitulo(const char *msg)
   loga("eTomada", LOG_AVISO, "\n====\n== %s ==\n====\n", msg);
 }
 
+bool logaProcessaPop();
 static uint32_t logaProximoLogRemoto = 0;
 void logaProcessa()
 {
-  // if (!logaRemotoAtivo())
-  //  return;
-
-  if ((int32_t)(millis() - logaProximoLogRemoto) < 0) // Nao martelar o servidor!
+  if (!logaRemotoAtivo())
     return;
 
-  LogRemoto log;
-  if (!logQueuePop(log))
+  if ((int32_t)(millis() - logaProximoLogRemoto) < 0) // Nao martelar o servidor!
     return;
 
   if (WiFi.status() != WL_CONNECTED)
     return;
 
+  logaProcessaPop();
+}
+
+bool logaProcessaPop()
+{
+  LogRemoto log;
+  if (!logQueuePop(log))
+    return false;
+
   HTTPClient http;
   WiFiClient client;
   if (!http.begin(client, logaServerURL))
   {
-    logaM(LOG_AVISO, "Nao foi possivel iniciar HTTP para log remoto.");
-    return;
+    Serial.println("Nao foi possivel iniciar HTTP para log remoto.");
+    return false;
   }
 
   http.setTimeout(1000);
@@ -237,7 +243,17 @@ void logaProcessa()
     logaProximoLogRemoto = millis() + 10;
   else
   {
-    logaM(LOG_AVISO, "POST de log remoto falhou: %d", status);
-    logaProximoLogRemoto = millis() + 2000;
+    Serial.printf("POST de log remoto falhou: %d\n", status);
+    logaProximoLogRemoto = millis() + 5 * 1000;
+    return false;
   }
+
+  return true;
+}
+
+void logaFlush()
+{
+  logaM(LOG_DEBUG0, "Flush dos logs");
+  while (logaProcessaPop())
+    delay(10);
 }

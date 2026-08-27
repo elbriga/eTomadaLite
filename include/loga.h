@@ -13,6 +13,8 @@ enum LogLevel
 };
 
 void logaInit();
+void logaProcessa();
+void logaFlush();
 
 void loga(const char *modulo, LogLevel nivel, const char *fmt, ...);
 void logaV(const char *modulo, LogLevel nivel, const char *fmt, va_list args);
