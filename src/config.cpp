@@ -9,7 +9,6 @@
 #define logaM(nivel, fmt, ...) loga("CONFIG.", nivel, fmt, ##__VA_ARGS__)
 
 #define EEPROM_SIZE 256
-#define CONFIG_MAGIC 0x45544F4DUL // "ETOM"
 
 Config config;
 
@@ -17,8 +16,8 @@ void configDefaults()
 {
   memset(&config, 0, sizeof(config));
 
-  config.magic = CONFIG_MAGIC;
-  strlcpy(config.hostname, "etomada-lite", sizeof(config.hostname));
+  config.magic = ETOMADA_LITE_CONFIG_MAGIC;
+  strlcpy(config.deviceID, "etomada-lite", sizeof(config.deviceID));
 }
 
 bool configLoad()
@@ -26,7 +25,7 @@ bool configLoad()
   EEPROM.begin(EEPROM_SIZE);
 
   EEPROM.get(0, config);
-  if (config.magic != CONFIG_MAGIC)
+  if (config.magic != ETOMADA_LITE_CONFIG_MAGIC)
   {
     logaM(LOG_AVISO, "Configuracao inexistente.");
     configDefaults();
@@ -34,8 +33,8 @@ bool configLoad()
   }
 
   logaM(LOG_NORMAL, "Configuracao carregada.");
+  logaM(LOG_NORMAL, "ID: %s", config.deviceID);
   logaM(LOG_NORMAL, "SSID: %s", config.ssid);
-  logaM(LOG_NORMAL, "Hostname: %s", config.hostname);
 
   return true;
 }

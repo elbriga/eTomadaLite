@@ -38,7 +38,7 @@ void wifiConnect()
   logaM(LOG_NORMAL, "Conectando em: %s", config.ssid);
 
   WiFi.mode(WIFI_STA);
-  WiFi.hostname(config.hostname);
+  WiFi.hostname(config.deviceID);
   WiFi.begin(config.ssid, config.senha);
 
   unsigned long inicio = millis();

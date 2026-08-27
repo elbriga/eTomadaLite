@@ -1,3 +1,4 @@
+#include "eTomadaLite.h"
 #include "memoria.h"
 #include "loga.h"
 
@@ -7,9 +8,8 @@
 void memoriaLog(const char *onde)
 {
     logaM(LOG_AVISO,
-          "MEMLOG [%s] : free=%u min=%u maxAlloc=%u",
+          "MEMLOG [%s] : free=%u maxAlloc=%u",
           onde,
           ESP.getFreeHeap(),
-          ESP.getMinFreeHeap(),
-          ESP.getMaxAllocHeap());
+          ESP.getMaxFreeBlockSize());
 }

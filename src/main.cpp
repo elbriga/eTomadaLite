@@ -20,6 +20,7 @@ void setup()
 
   delay(100);
 
+  configLoad(); // Inicializar primeiro para usar o deviceID no log
   logaInit();
 
   Serial.println();
@@ -38,8 +39,6 @@ void setup()
   // Hardware
   ledInit();
   releInit();
-
-  configLoad();
 
   wifiConnect();
 
