@@ -6,6 +6,8 @@
 
 #include "eTomadaLite.h"
 #include "loga.h"
+#include "config.h"
+#include "rele.h"
 
 #define ETOMADA_LITE_VERSAO "0.0.7"
 // 0.0.6 - led por TS
@@ -16,90 +18,16 @@
 
 void logaProcessa();
 
-// ============================================================
-// Configuração
-// ============================================================
-#define EEPROM_SIZE 256
-#define CONFIG_MAGIC 0x45544F4DUL // "ETOM"
-
-struct Config
-{
-  uint32_t magic;
-
-  char ssid[64];
-  char senha[64];
-
-  char hostname[32];
-};
-
-Config config;
+extern Config config;
 
 ESP8266WebServer server(80);
-
-bool releLigado = false;
 
 const char *otaErroMsg = nullptr;
 size_t otaTamanhoEsperado = 0;
 
 // ============================================================
-// Configuração
-// ============================================================
-void configDefaults()
-{
-  memset(&config, 0, sizeof(config));
-
-  config.magic = CONFIG_MAGIC;
-  strlcpy(config.hostname, "etomada-lite", sizeof(config.hostname));
-}
-
-bool configLoad()
-{
-  EEPROM.begin(EEPROM_SIZE);
-
-  EEPROM.get(0, config);
-  if (config.magic != CONFIG_MAGIC)
-  {
-    logaM(LOG_AVISO, "Configuracao inexistente.");
-    configDefaults();
-    return false;
-  }
-
-  logaM(LOG_NORMAL, "Configuracao carregada.");
-  logaM(LOG_NORMAL, "SSID: %s", config.ssid);
-  logaM(LOG_NORMAL, "Hostname: %s", config.hostname);
-
-  return true;
-}
-
-void configSave()
-{
-  EEPROM.put(0, config);
-  if (!EEPROM.commit())
-  {
-    logaM(LOG_CRITICO, "Erro ao salvar configuracao!");
-    return;
-  }
-
-  logaM(LOG_NORMAL, "Configuracao salva.");
-}
-
-// ============================================================
-// Relé
-// ============================================================
-
-void releSet(bool ligado)
-{
-  releLigado = ligado;
-
-  digitalWrite(RELE_GPIO, ligado);
-
-  logaM(LOG_NORMAL, "Rele: %s", ligado ? "ON" : "OFF");
-}
-
-// ============================================================
 // WiFi
 // ============================================================
-
 void wifiStartAP()
 {
   String apName = "eTomada-";
@@ -174,7 +102,7 @@ void apiGetSnapshot()
   resposta += millis();
 
   resposta += F(",\"rele\":");
-  resposta += releLigado ? "1" : "0";
+  resposta += releGetEstado() ? "1" : "0";
 
   resposta += F(",\"mac\":\"");
   resposta += WiFi.macAddress();
@@ -222,35 +150,6 @@ void apiConfigWifi()
   delay(100);
 
   wifiConnect();
-}
-
-void apiSetRele()
-{
-  if (!server.hasArg("estado"))
-  {
-    server.send(400, "application/json", R"({"ok":false,"msg":"missing estado"})");
-    return;
-  }
-
-  String estado = server.arg("estado");
-
-  bool ligado =
-      estado == "1" ||
-      estado == "on" ||
-      estado == "ON" ||
-      estado == "true";
-
-  releSet(ligado);
-
-  String resposta;
-
-  resposta.reserve(64);
-
-  resposta = F("{\"ok\":true,\"rele\":");
-  resposta += releLigado ? "1" : "0";
-  resposta += "}";
-
-  server.send(200, "application/json", resposta);
 }
 
 // ============================================================
@@ -421,8 +320,7 @@ void setup()
   // Hardware
   pinMode(LED_GPIO, OUTPUT);   // Led Azul do MINI
   digitalWrite(LED_GPIO, LOW); // LOW = Aceso!
-  pinMode(RELE_GPIO, OUTPUT);
-  releSet(false);
+  releInit();
 
   configLoad();
   wifiConnect();
