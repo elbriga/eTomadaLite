@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <ESP8266WebServer.h>
 
 #include "loga.h"
 #include "rele.h"
