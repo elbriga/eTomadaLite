@@ -4,12 +4,12 @@
 #include "rele.h"
 #include "wifi.h"
 #include "http.h"
+#include "mdns-gs.h"
 #include "led.h"
+#include "memoria.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".MAIN..", nivel, fmt, ##__VA_ARGS__)
-
-void logaProcessa();
 
 // ============================================================
 // Setup
@@ -40,14 +40,25 @@ void setup()
   releInit();
 
   configLoad();
+
   wifiConnect();
+
   httpInit();
+  mdnsInit();
 
   logaM(LOG_NORMAL, "Inicializacao concluida.");
 }
 
+static uint32_t tsOla = 0;
 void loop()
 {
+  if (millis() - tsOla > 60 * 60 * 1000)
+  {
+    memoriaLog("1h/1h");
+    tsOla = millis();
+  }
+
+  mdnsProcessa();
   httpProcessa();
   logaProcessa();
   ledProcessa();
