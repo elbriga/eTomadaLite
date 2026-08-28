@@ -2,3 +2,4 @@
 
 void apiGetSnapshot();
 void apiConfigHostname();
+void apiRestart();

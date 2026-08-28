@@ -4,6 +4,7 @@
 #include "loga.h"
 #include "rele.h"
 #include "config.h"
+#include "util.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..API..", nivel, fmt, ##__VA_ARGS__)
@@ -66,4 +67,12 @@ void apiConfigHostname()
   strlcpy(config.deviceID, devID.c_str(), sizeof(config.deviceID));
 
   configSave();
+
+  server.send(200, "application/json", R"({"ok":true,"msg":"hostname configurado"})");
+}
+
+void apiRestart()
+{
+  server.send(200, "application/json", R"({"ok":true,"msg":"vou reiniciar"})");
+  utilRestart();
 }
