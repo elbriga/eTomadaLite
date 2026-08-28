@@ -12,6 +12,8 @@ extern ESP8266WebServer server;
 
 static const char *otaErroMsg = nullptr;
 static size_t otaTamanhoEsperado = 0;
+static int otaTamanhoAtual = 0;
+static int otaDownloadUltimoPercentual = -1;
 
 void apiOtaFlash()
 {
@@ -61,10 +63,21 @@ void apiOtaFlash()
     if (otaErroMsg != nullptr)
       return;
 
-    size_t gravado =
-        Update.write(upload.buf, upload.currentSize);
+    size_t gravado = Update.write(upload.buf, upload.currentSize);
 
-    Serial.print(".");
+    // Loga somente a cada 10%
+    otaTamanhoAtual += gravado;
+    int percentual = (otaTamanhoAtual * 100) / otaTamanhoEsperado;
+    if (percentual / 10 != otaDownloadUltimoPercentual / 10)
+    {
+      otaDownloadUltimoPercentual = percentual;
+
+      logaM(LOG_NORMAL,
+            "OTA: %d%% (%u/%u bytes)",
+            percentual,
+            (unsigned)otaTamanhoAtual,
+            (unsigned)otaTamanhoEsperado);
+    }
 
     if (gravado != upload.currentSize)
     {
