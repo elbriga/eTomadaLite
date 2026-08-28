@@ -5,7 +5,7 @@
 #include "hardwareProfile.h"
 #include "config.h"
 
-#define ETOMADA_LITE_VERSAO "0.2.0"
+#define ETOMADA_LITE_VERSAO "0.2.2"
 // 0.0.6 - led por TS
 // 0.0.7 - logaM e log remoto
 // 0.0.8 - modularizado
@@ -13,6 +13,8 @@
 // 0.1.0 - mDNS
 // 0.1.1 - memoriaLog(1h/1h)
 // 0.2.0 - hostname/deviceID configuravel
+// 0.2.1 - /api/restart
+// 0.2.2 - SSID e MAC no mDNS
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("ETOMADA", nivel, fmt, ##__VA_ARGS__)
