@@ -29,6 +29,7 @@ void setup()
   logaM(LOG_NORMAL, "       eTomada Lite");
   logaM(LOG_NORMAL, "==============================");
 
+  logaM(LOG_NORMAL, "Hostname: %s", eTomadaLiteDeviceID().c_str());
   logaM(LOG_NORMAL, "Versao: %s", eTomadaLiteVersion().c_str());
 
   logaM(LOG_NORMAL, "Chip ID: %08X", ESP.getChipId());

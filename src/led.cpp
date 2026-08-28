@@ -6,7 +6,7 @@
 #include "hardwareProfile.h"
 
 // Função de log para esta modulo
-#define logaM(nivel, fmt, ...) loga("LED", nivel, fmt, ##__VA_ARGS__)
+#define logaM(nivel, fmt, ...) loga(".LED...", nivel, fmt, ##__VA_ARGS__)
 
 extern const HardwareProfile hardwareProfile;
 

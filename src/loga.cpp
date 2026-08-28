@@ -13,7 +13,7 @@ LogLevel logLevel = LOG_NORMAL;
 
 #define LOG_MESSAGE_SIZE 256
 
-#define LOG_SERVER "192.168.1.220:8080"
+#define LOG_SERVER "10.0.0.1:8080"
 #define LOG_QUEUE_SIZE 32
 
 struct LogRemoto
