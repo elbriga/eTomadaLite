@@ -71,7 +71,7 @@ void apiConfigHostname()
   server.send(200, "application/json", R"({"ok":true,"msg":"hostname configurado"})");
 }
 
-void apiRestart()
+void apiReset()
 {
   server.send(200, "application/json", R"({"ok":true,"msg":"vou reiniciar"})");
   utilRestart();

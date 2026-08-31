@@ -31,7 +31,7 @@ void httpInit()
 
   server.on("/api/setRele", HTTP_GET, apiSetRele);
 
-  server.on("/api/restart", HTTP_GET, apiRestart);
+  server.on("/api/reset", HTTP_GET, apiReset);
 
   server.on("/api/ota", HTTP_POST, apiOtaFlashHelper, apiOtaFlash);
 

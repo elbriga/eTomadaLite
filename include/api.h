@@ -2,4 +2,4 @@
 
 void apiGetSnapshot();
 void apiConfigHostname();
-void apiRestart();
+void apiReset();
