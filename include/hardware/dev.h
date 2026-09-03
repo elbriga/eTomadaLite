@@ -7,4 +7,5 @@ const HardwareProfile hardwareProfile = {
     .ledPin = 13,
     .ledInvertido = false,
     .relePin = 12,
+    .botaoPin = 0,
 };

@@ -6,5 +6,6 @@ const HardwareProfile hardwareProfile = {
     .board = "d1_mini",
     .ledPin = 13,
     .ledInvertido = false,
-    .relePin = 15,
+    .relePin = 2,
+    .botaoPin = 255,
 };

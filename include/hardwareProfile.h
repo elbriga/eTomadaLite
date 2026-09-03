@@ -8,6 +8,7 @@ typedef struct
     int ledPin;
     bool ledInvertido;
     int relePin;
+    int botaoPin;
 } HardwareProfile;
 
 #ifdef HW_DEV
