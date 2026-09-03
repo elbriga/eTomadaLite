@@ -7,10 +7,11 @@ struct Config
 {
   uint32_t magic;
 
-  char ssid[64];
-  char senha[64];
+  char ssid[32];
+  char senha[32];
 
   char deviceID[32];
+  char mestre[32];
 };
 
 bool configLoad();

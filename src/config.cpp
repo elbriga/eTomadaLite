@@ -18,6 +18,12 @@ void configDefaults()
 
   config.magic = ETOMADA_LITE_CONFIG_MAGIC;
   strlcpy(config.deviceID, "etomada-lite", sizeof(config.deviceID));
+
+  // TESTES
+  // strlcpy(config.deviceID, "DEV", sizeof(config.deviceID));
+  // strlcpy(config.mestre, "GROW", sizeof(config.mestre));
+  // strlcpy(config.ssid, "GLS", sizeof(config.mestre));
+  // strlcpy(config.senha, "Lola09876543*", sizeof(config.mestre));
 }
 
 bool configLoad()
@@ -25,6 +31,10 @@ bool configLoad()
   EEPROM.begin(EEPROM_SIZE);
 
   EEPROM.get(0, config);
+
+  // Testes
+  // configDefaults();
+
   if (config.magic != ETOMADA_LITE_CONFIG_MAGIC)
   {
     logaM(LOG_AVISO, "Configuracao inexistente.");
