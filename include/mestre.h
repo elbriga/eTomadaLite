@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 
+#include "eventos.h"
+
 struct Mestre
 {
     String deviceID;
@@ -17,4 +19,4 @@ void mestreLoop();
 bool mestreAtivo();
 IPAddress mestreGetIP();
 
-void mestreEnviaEvento(TipoEvento tipoEvento, const char *json);
+void mestreEnviaEvento(TipoEvento tipoEvento, const char *device);

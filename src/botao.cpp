@@ -72,29 +72,10 @@ void botaoProcessa()
       uint32_t duracaoAnterior = agora - botao.ultimoToggle;
       botao.ultimoToggle = agora;
 
-      time_t now = 0;
-      time(&now);
+      String device = F("\"estado\":");
+      device += leitura ? "true" : "false";
 
-      String body;
-      body.reserve(512);
-
-      body = F("{\"origem\":\"");
-      body += eTomadaLiteDeviceID();
-      body += F("\",\"id\":\"B1\"");
-
-      body += F(",\"timestamp\":");
-      body += (unsigned long)now;
-
-      body += F(",\"evento\":\"TOGGLE\"");
-
-      body += F(",\"device\":{");
-
-      body += F("\"estado\":");
-      body += leitura ? "1" : "0";
-
-      body += F("}}");
-
-      mestreEnviaEvento(EVENTO_TOGGLE, body.c_str());
+      mestreEnviaEvento(EVENTO_TOGGLE, device.c_str());
 
       /*
       eventoPost(botao->estado ? EVENTO_LIGOU : EVENTO_DESLIGOU, atual[rb].rec, true, true);

@@ -9,7 +9,7 @@
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("LOGS", nivel, fmt, ##__VA_ARGS__)
 
-LogLevel logLevel = LOG_NORMAL;
+LogLevel logLevel = LOG_DEBUG;
 
 #define LOG_MESSAGE_SIZE 256
 

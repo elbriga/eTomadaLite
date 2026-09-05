@@ -37,18 +37,18 @@ void mestreCheckOnline()
     // Escanear
     int totND = MDNS.queryService("etomada", "tcp");
 
-    logaM(LOG_AVISO, "totND: %d", totND);
+    // logaM(LOG_AVISO, "totND: %d", totND);
 
     // Procurar nosso mestre
     String mestreFQDN = mestre.deviceID + ".local";
     IPAddress ipMestre = (IPAddress)0;
     for (int nd = 0; nd < totND; nd++)
     {
-        logaM(LOG_AVISO, "[%d]: %s == %s", nd, MDNS.hostname(nd).c_str(), mestre.deviceID.c_str());
+        // logaM(LOG_AVISO, "[%d]: %s == %s", nd, MDNS.hostname(nd).c_str(), mestre.deviceID.c_str());
         if (MDNS.hostname(nd) == mestreFQDN)
         {
             ipMestre = MDNS.IP(nd);
-            // break;
+            break;
         }
     }
     if (ipMestre)
@@ -78,7 +78,7 @@ void mestreLoop()
     }
 }
 
-void mestreEnviaEvento(TipoEvento tipoEvento, const char *json)
+void mestreEnviaEvento(TipoEvento tipoEvento, const char *device)
 {
     if (!mestreAtivo()) // Sem mestre retorna
         return;
@@ -89,7 +89,29 @@ void mestreEnviaEvento(TipoEvento tipoEvento, const char *json)
         return;
     }
 
-    apiInternaEnviaEvento(mestre.ip, json);
+    time_t now = 0;
+    time(&now);
+
+    String body;
+    body.reserve(256);
+
+    body = F("{\"origem\":\"");
+    body += eTomadaLiteDeviceID();
+    body += F("\",\"id\":\"B1\"");
+
+    body += F(",\"timestamp\":");
+    body += (unsigned long)now;
+
+    body += F(",\"evento\":\"");
+    body += eventoGetTipoTxt(tipoEvento);
+
+    body += F("\",\"device\":{");
+
+    body += device;
+
+    body += F("}}");
+
+    apiInternaEnviaEvento(mestre.ip, body.c_str());
 }
 
 bool mestreAtivo()
