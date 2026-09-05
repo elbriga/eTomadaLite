@@ -8,6 +8,7 @@
 #include "led.h"
 #include "memoria.h"
 #include "mestre.h"
+#include "botao.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".MAIN..", nivel, fmt, ##__VA_ARGS__)
@@ -52,39 +53,56 @@ void setup()
   logaM(LOG_NORMAL, "Inicializacao concluida.");
 }
 
-static uint32_t tsMemLog = 0;
-static uint32_t tsSensorLog = 0;
+static time_t ultimoSegundo = -1;
+static time_t ultimo10s = -1;
+static time_t tsTimerHora = 0;
 void loop()
 {
-  if (millis() - tsMemLog > 60 * 60 * 1000)
+  struct tm timeinfo;
+  time_t now = time(nullptr);
+  localtime_r(&now, &timeinfo);
+
+  // 1s/1s
+  if (ultimoSegundo != timeinfo.tm_sec)
   {
-    memoriaLog("1h/1h");
-    tsMemLog = millis();
+    ultimoSegundo = timeinfo.tm_sec;
+
+    mestreLoop();
+
+    // 10s/10s
+    if (ultimo10s != timeinfo.tm_sec / 10)
+    {
+      ultimo10s = timeinfo.tm_sec / 10;
+
+      mestreCheckOnline();
+    }
+
+    // 1h/1h
+    if (now - tsTimerHora > 60 * 60)
+    {
+      memoriaLog("1h/1h");
+      tsTimerHora = now;
+    }
+
+    // {
+    //   int sensor = analogRead(A0);
+    //   logaM(LOG_NORMAL, "======================");
+    //   logaM(LOG_NORMAL, "A0: %d", sensor);
+    //   logaM(LOG_NORMAL, "D5: %d", digitalRead(D5));
+    //   logaM(LOG_NORMAL, "======================");
+    //   if (sensor < 400)
+    //     digitalWrite(15, 1);
+    //   else
+    //     digitalWrite(15, 0);
+    // }
   }
 
-  // if (millis() - tsSensorLog > 1000)
-  // {
-  //   int sensor = analogRead(A0);
-  //   logaM(LOG_NORMAL, "======================");
-  //   logaM(LOG_NORMAL, "A0: %d", sensor);
-  //   logaM(LOG_NORMAL, "D5: %d", digitalRead(D5));
-  //   logaM(LOG_NORMAL, "======================");
-
-  //   if (sensor < 400)
-  //     digitalWrite(15, 1);
-  //   else
-  //     digitalWrite(15, 0);
-
-  //   tsSensorLog = millis();
-  // }
-
-  // TODO :: 1s/1s
-  mestreLoop();
-
+  // 5ms/5ms
   mdnsProcessa();
   httpProcessa();
   logaProcessa();
   ledProcessa();
+  botaoProcessa();
 
-  yield();
+  delay(5);
 }

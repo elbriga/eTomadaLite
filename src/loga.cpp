@@ -201,6 +201,7 @@ bool logaProcessaPop()
   if (!logQueuePop(log))
     return false;
 
+  // TODO :: Usar apiInterna
   HTTPClient http;
   WiFiClient client;
   if (!http.begin(client, logaServerURL))

@@ -17,4 +17,4 @@ void mestreLoop();
 bool mestreAtivo();
 IPAddress mestreGetIP();
 
-// void mestreEnviaEvento(Recurso *rec, TipoEvento tipoEvento);
+void mestreEnviaEvento(TipoEvento tipoEvento, const char *json);

@@ -4,9 +4,11 @@
 #include "mestre.h"
 #include "loga.h"
 #include "config.h"
+#include "eventos.h"
+#include "apiInterna.h"
 
 // Função de log para esta modulo
-#define logaM(nivel, fmt, ...) loga("MESTRE", nivel, fmt, ##__VA_ARGS__)
+#define logaM(nivel, fmt, ...) loga("MESTRE.", nivel, fmt, ##__VA_ARGS__)
 
 Mestre mestre;
 
@@ -76,7 +78,7 @@ void mestreLoop()
     }
 }
 
-/*void mestreEnviaEvento(TipoEvento tipoEvento, char *json)
+void mestreEnviaEvento(TipoEvento tipoEvento, const char *json)
 {
     if (!mestreAtivo()) // Sem mestre retorna
         return;
@@ -87,10 +89,8 @@ void mestreLoop()
         return;
     }
 
-    JsonDocument payload = recursoGetJSONEvento(rec, tipoEvento);
-
-    apiInternaEnviaEvento(mestre.ip, &payload);
-}*/
+    apiInternaEnviaEvento(mestre.ip, json);
+}
 
 bool mestreAtivo()
 {

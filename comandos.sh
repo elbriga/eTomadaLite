@@ -1,7 +1,7 @@
 # sonoff
 # Avahi?
 https://www.sigmdel.ca/michel/ha/sonoff/sonoff_mini_en.html
-avahi-browse -t _ewelink._tcp --resolve
+avahi-browse -t _etomada._tcp --resolve
 # API
 curl -v http://192.168.1.115:8081/zeroconf/info -H "Content-Type: application/json" -d '{"deviceid":"1000c8797e","data":{}}'
 
