@@ -18,3 +18,5 @@ enum TipoEvento
 
     EVENTO_HORARIO = 300,
 };
+
+const char *eventoGetTipoTxt(TipoEvento tipo);
