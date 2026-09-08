@@ -9,7 +9,7 @@
 #include "eventos.h"
 
 // Função de log para esta modulo
-#define logaM(nivel, fmt, ...) loga("BOTAO", nivel, fmt, ##__VA_ARGS__)
+#define logaM(nivel, fmt, ...) loga(".BOTAO.", nivel, fmt, ##__VA_ARGS__)
 
 // Hardware Profile - um para cada placa
 extern const HardwareProfile hardwareProfile;

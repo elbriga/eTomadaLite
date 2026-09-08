@@ -66,6 +66,7 @@ int apiInterna(const char *host, const char *endpoint, const char *request, char
   String url = "http://" + String(host) + "/api/" + endpoint;
 
   logaM(LOG_DEBUG0, "apiInterna: Acionando %s", url.c_str());
+  logaM(LOG_DEBUG0, "body: [%s]", request);
 
   HTTPClient http;
   WiFiClient client;

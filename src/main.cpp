@@ -9,9 +9,12 @@
 #include "memoria.h"
 #include "mestre.h"
 #include "botao.h"
+#include "ntp.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".MAIN..", nivel, fmt, ##__VA_ARGS__)
+
+static bool modoAP = false;
 
 // ============================================================
 // Setup
@@ -42,13 +45,19 @@ void setup()
   // Hardware
   ledInit();
   releInit();
+  botoesInit();
 
   wifiConnect();
+  modoAP = wifiGetModoAP();
 
   httpInit();
-  mdnsInit();
 
-  mestreInit();
+  if (!modoAP)
+  {
+    ntpInit();
+    mdnsInit();
+    mestreInit();
+  }
 
   logaM(LOG_NORMAL, "Inicializacao concluida.");
 }
@@ -67,14 +76,16 @@ void loop()
   {
     ultimoSegundo = timeinfo.tm_sec;
 
-    mestreLoop();
+    if (!modoAP)
+      mestreLoop();
 
     // 10s/10s
     if (ultimo10s != timeinfo.tm_sec / 10)
     {
       ultimo10s = timeinfo.tm_sec / 10;
 
-      mestreCheckOnline();
+      if (!modoAP)
+        mestreCheckOnline();
     }
 
     // 1h/1h
@@ -98,11 +109,15 @@ void loop()
   }
 
   // 5ms/5ms
-  mdnsProcessa();
   httpProcessa();
-  logaProcessa();
   ledProcessa();
   botaoProcessa();
+
+  if (!modoAP)
+  {
+    logaProcessa();
+    mdnsProcessa();
+  }
 
   delay(5);
 }
