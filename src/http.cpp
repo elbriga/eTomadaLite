@@ -5,7 +5,7 @@
 #include "api.h"
 #include "wifi.h"
 #include "rele.h"
-#include "ota.h"
+#include "recovery.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".HTTP..", nivel, fmt, ##__VA_ARGS__)
@@ -33,7 +33,7 @@ void httpInit()
 
   server.on("/api/reset", HTTP_GET, apiReset);
 
-  server.on("/api/ota", HTTP_POST, apiOtaFlashHelper, apiOtaFlash);
+  recoveryAPIRegister();
 
   server.on("/", HTTP_GET, httpRoot);
 

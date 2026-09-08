@@ -3,7 +3,7 @@
 #include "loga.h"
 
 // Função de log para esta modulo
-#define logaM(nivel, fmt, ...) loga("MEM", nivel, fmt, ##__VA_ARGS__)
+#define logaM(nivel, fmt, ...) loga("..MEM..", nivel, fmt, ##__VA_ARGS__)
 
 void memoriaLog(const char *onde)
 {

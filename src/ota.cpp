@@ -23,6 +23,8 @@ void apiOtaFlash()
   {
     otaErroMsg = nullptr;
     otaTamanhoEsperado = 0;
+    otaTamanhoAtual = 0;
+    otaDownloadUltimoPercentual = -1;
 
     if (!server.hasArg("tamanho"))
     {

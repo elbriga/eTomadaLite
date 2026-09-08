@@ -7,7 +7,7 @@
 #include "loga.h"
 
 // Função de log para esta modulo
-#define logaM(nivel, fmt, ...) loga("LOGS", nivel, fmt, ##__VA_ARGS__)
+#define logaM(nivel, fmt, ...) loga(".LOGS..", nivel, fmt, ##__VA_ARGS__)
 
 LogLevel logLevel = LOG_DEBUG;
 

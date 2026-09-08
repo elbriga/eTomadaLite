@@ -8,8 +8,6 @@
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("CONFIG.", nivel, fmt, ##__VA_ARGS__)
 
-#define EEPROM_SIZE 256
-
 Config config;
 
 void configDefaults()
@@ -30,7 +28,7 @@ void configDefaults()
 
 bool configLoad()
 {
-  EEPROM.begin(EEPROM_SIZE);
+  EEPROM.begin(ETOMADA_LITE_EEPROM_SIZE);
 
   EEPROM.get(0, config);
 
