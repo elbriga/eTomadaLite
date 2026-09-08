@@ -201,22 +201,16 @@ static void recoveryWifiInit()
 
         WiFi.hostname(config.deviceID);
 
-        WiFi.begin(
-            config.ssid,
-            config.senha);
+        WiFi.begin(config.ssid, config.senha);
 
-        Serial.printf(
-            "Recovery conectando em %s",
-            config.ssid);
+        Serial.printf("Recovery conectando em %s", config.ssid);
 
         uint32_t inicio = millis();
-
         while (
             WiFi.status() != WL_CONNECTED &&
             millis() - inicio < RECOVERY_WIFI_TIMEOUT_MS)
         {
             // recoveryLedLoop();
-
             Serial.print(".");
             delay(50);
         }
@@ -251,9 +245,7 @@ static void recoveryWifiInit()
         String(RECOVERY_AP_PREFIX) +
         String(ESP.getChipId(), HEX);
 
-    if (!WiFi.softAP(
-            apSSID.c_str(),
-            RECOVERY_AP_PASS))
+    if (!WiFi.softAP(apSSID.c_str(), RECOVERY_AP_PASS))
     {
         Serial.println("ERRO iniciando AP recovery");
         return;
@@ -261,10 +253,7 @@ static void recoveryWifiInit()
 
     modoAP = true;
 
-    Serial.printf(
-        "Recovery AP: %s\n",
-        apSSID.c_str());
-
+    Serial.printf("Recovery AP: %s\n", apSSID.c_str());
     Serial.print("IP: ");
     Serial.println(WiFi.softAPIP());
 }
