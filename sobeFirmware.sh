@@ -17,7 +17,11 @@ SHA=$(sha256sum $FW | awk '{print $1}')
 
 URL="http://$HOST/api/ota?tamanho=$TAM&sha=$SHA"
 
-CMD="curl -X POST -F \"firmware=@$FW\" '$URL'"
+# Firmware para o LN882 é UF2 > enviar esse header a mais
+[[ "$FW" == *.uf2 ]] && echo ">> Modo LN882H"
+[[ "$FW" == *.uf2 ]] && MODOUF2=";type=application/octet-stream"
+
+CMD="curl -X POST -F \"firmware=@$FW$MODOUF2\" '$URL'"
 
 echo "============================"
 echo "Subindo FW: $FW"
@@ -26,5 +30,4 @@ echo "============================"
 echo $CMD
 echo
 
-curl -X POST -F "firmware=@$FW" "$URL"
-
+curl -X POST -F "firmware=@$FW$MODOUF2" "$URL"
