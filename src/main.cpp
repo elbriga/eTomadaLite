@@ -1,22 +1,17 @@
-#include "eTomadaLite.h"
-#include "app.h"
-#include "recovery.h"
-#include "loga.h"
+#include <Arduino.h>
 
-// Função de log para esta modulo
-#define logaM(nivel, fmt, ...) loga(".MAIN..", nivel, fmt, ##__VA_ARGS__)
+#include "recovery.h"
+#include "app.h"
 
 static bool modoRecovery = false;
 
-// ============================================================
-// Setup
-// ============================================================
 void setup()
 {
   Serial.begin(115200);
   delay(100);
 
   Serial.println();
+  Serial.println("====== eTomada ======");
   Serial.println();
 
   modoRecovery = recoveryBoot();

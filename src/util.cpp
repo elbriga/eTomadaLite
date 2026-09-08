@@ -5,9 +5,9 @@
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".UTIL..", nivel, fmt, ##__VA_ARGS__)
 
-void utilRestart()
+void utilRestart(const char *porque)
 {
-  logaM(LOG_AVISO, "RESTART!");
+  logaM(LOG_AVISO, "RESTART! [%s]", porque);
 
   // Limpar a fila de logs antes de reiniciar
   logaFlush();
@@ -21,15 +21,9 @@ void utilRestart()
 String utilIPToString(IPAddress ip)
 {
   char buffer[16];
-
-  snprintf(
-      buffer,
-      sizeof(buffer),
-      "%u.%u.%u.%u",
-      ip[0],
-      ip[1],
-      ip[2],
-      ip[3]);
+  snprintf(buffer, sizeof(buffer),
+           "%u.%u.%u.%u",
+           ip[0], ip[1], ip[2], ip[3]);
 
   return String(buffer);
 }

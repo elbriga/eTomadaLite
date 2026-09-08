@@ -73,5 +73,5 @@ void apiConfigHostname()
 void apiReset()
 {
   server.send(200, "application/json", R"({"ok":true,"msg":"vou reiniciar"})");
-  utilRestart();
+  utilRestart("API reset");
 }

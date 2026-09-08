@@ -80,8 +80,7 @@ void apiOtaFlash()
       logaM(LOG_AVISO, "OTA: Update.begin falhou");
       Update.printError(Serial);
 #else
-      logaM(LOG_AVISO, "OTA: Update.begin falhou: %s",
-            Update.errorString());
+      logaM(LOG_AVISO, "OTA: Update.begin falhou: %s", Update.errorString());
 #endif
 
       return;
@@ -106,11 +105,10 @@ void apiOtaFlash()
     {
       otaErroMsg = "erro ao gravar";
 
-#if !defined(ESP8266)
-      logaM(LOG_CRITICO, "OTA: erro ao gravar: %s",
-            Update.errorString());
-#else
+#if defined(ESP8266)
       logaM(LOG_CRITICO, "OTA: erro ao gravar");
+#else
+      logaM(LOG_CRITICO, "OTA: erro ao gravar: %s", Update.errorString());
 #endif
 
       return;
@@ -122,9 +120,7 @@ void apiOtaFlash()
     if (percentual / 10 != otaDownloadUltimoPercentual / 10)
     {
       otaDownloadUltimoPercentual = percentual;
-
-      logaM(LOG_NORMAL,
-            "OTA: %d%% (%u/%u bytes)",
+      logaM(LOG_NORMAL, "OTA: %d%% (%u/%u bytes)",
             percentual,
             (unsigned)otaTamanhoAtual,
             (unsigned)otaTamanhoEsperado);
@@ -156,7 +152,8 @@ void apiOtaFlash()
 
     if (!Update.isRunning())
     {
-      otaErroMsg = "Update nao esta em execucao";
+      if (!otaErroMsg)
+        otaErroMsg = "Update nao esta em execucao";
       return;
     }
 
@@ -168,8 +165,7 @@ void apiOtaFlash()
       logaM(LOG_AVISO, "OTA: Update.end falhou");
       Update.printError(Serial);
 #else
-      logaM(LOG_AVISO, "OTA: Update.end falhou: %s",
-            Update.errorString());
+      logaM(LOG_AVISO, "OTA: Update.end falhou: %s", Update.errorString());
 #endif
 
       return;
@@ -206,5 +202,5 @@ void apiOtaFlashHelper()
 
   server.send(200, "application/json", R"({"ok":true,"msg":"ota ok > restart"})");
 
-  utilRestart();
+  utilRestart("OTA");
 }
