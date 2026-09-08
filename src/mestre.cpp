@@ -6,6 +6,7 @@
 #include "config.h"
 #include "eventos.h"
 #include "apiInterna.h"
+#include "wifi.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("MESTRE.", nivel, fmt, ##__VA_ARGS__)
@@ -82,6 +83,12 @@ void mestreEnviaEvento(TipoEvento tipoEvento, const char *device)
 {
     if (!mestreAtivo()) // Sem mestre retorna
         return;
+
+    if (WiFi.status() != WL_CONNECTED || wifiGetModoAP())
+    {
+        logaM(LOG_AVISO, "offline ou Modo AP. Descartando evento [%d]", tipoEvento);
+        return;
+    }
 
     if (!mestre.online)
     {

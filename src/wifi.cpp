@@ -12,6 +12,12 @@
 extern Config config;
 extern ESP8266WebServer server;
 
+bool wifiGetModoAP()
+{
+  WiFiMode_t mode = WiFi.getMode();
+  return mode == WIFI_AP_STA || mode == WIFI_AP;
+}
+
 void wifiStartAP()
 {
   String apName = "eTomada-";
