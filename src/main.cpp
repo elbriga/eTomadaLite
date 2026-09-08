@@ -1,6 +1,6 @@
 #include "eTomadaLite.h"
-#include "recovery.h"
 #include "app.h"
+#include "recovery.h"
 #include "loga.h"
 
 // Função de log para esta modulo

@@ -213,6 +213,13 @@ bool logaProcessaPop()
   http.setTimeout(1000);
   http.addHeader("Content-Type", "application/json");
 
+  String msg = log.message;
+  msg.replace("\\", "\\\\");
+  msg.replace("\"", "\\\"");
+  msg.replace("\n", "\\n");
+  msg.replace("\r", "\\r");
+  msg.replace("\t", "\\t");
+
   String body;
   body.reserve(512);
 
@@ -231,7 +238,7 @@ bool logaProcessaPop()
   body += log.modulo;
 
   body += F("\",\"message\":\"");
-  body += log.message;
+  body += msg;
 
   body += F("\"}");
 
@@ -254,7 +261,7 @@ bool logaProcessaPop()
 
 void logaFlush()
 {
-  logaM(LOG_DEBUG0, "Flush dos logs");
+  Serial.println("Flush dos logs");
   while (logaProcessaPop())
     delay(10);
 }
