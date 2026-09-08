@@ -1,16 +1,15 @@
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
-
 #include "eTomadaLite.h"
+#include "platform.h"
 #include "loga.h"
 #include "wifi.h"
 #include "config.h"
+#include "util.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".WIFI..", nivel, fmt, ##__VA_ARGS__)
 
 extern Config config;
-extern ESP8266WebServer server;
+extern ETomadaWebServer server;
 
 bool wifiGetModoAP()
 {
@@ -29,7 +28,8 @@ void wifiStartAP()
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAP(apName.c_str());
 
-  logaM(LOG_AVISO, "AP IP: %s", WiFi.softAPIP().toString().c_str());
+  String ipStr = utilIPToString(WiFi.softAPIP());
+  logaM(LOG_AVISO, "AP IP: %s", ipStr.c_str());
 }
 
 void wifiConnect()
@@ -58,7 +58,8 @@ void wifiConnect()
   if (WiFi.status() == WL_CONNECTED)
   {
     logaM(LOG_NORMAL, "WiFi conectado!");
-    logaM(LOG_NORMAL, "IP: %s", WiFi.localIP().toString().c_str());
+    String ipStr = utilIPToString(WiFi.localIP());
+    logaM(LOG_NORMAL, "IP: %s", ipStr.c_str());
   }
   else
   {

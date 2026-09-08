@@ -1,12 +1,12 @@
-#include <ESP8266mDNS.h>
-
 #include "eTomadaLite.h"
+#include "platform.h"
 #include "mestre.h"
 #include "loga.h"
 #include "config.h"
 #include "eventos.h"
 #include "apiInterna.h"
 #include "wifi.h"
+#include "util.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("MESTRE.", nivel, fmt, ##__VA_ARGS__)
@@ -20,7 +20,7 @@ extern Config config;
 void mestreInit()
 {
     mestre.deviceID = String(config.mestre);
-    mestre.ip = (IPAddress)0;
+    mestre.ip = IPAddress(0, 0, 0, 0);
     mestre.ultimoHeartbeat = 0;
     mestre.online = false;
 
@@ -35,6 +35,7 @@ void mestreCheckOnline()
     if (!mestreAtivo())
         return;
 
+#if defined(ESP8266)
     // Escanear
     int totND = MDNS.queryService("etomada", "tcp");
 
@@ -42,7 +43,7 @@ void mestreCheckOnline()
 
     // Procurar nosso mestre
     String mestreFQDN = mestre.deviceID + ".local";
-    IPAddress ipMestre = (IPAddress)0;
+    IPAddress ipMestre = IPAddress(0, 0, 0, 0);
     for (int nd = 0; nd < totND; nd++)
     {
         // logaM(LOG_AVISO, "[%d]: %s == %s", nd, MDNS.hostname(nd).c_str(), mestre.deviceID.c_str());
@@ -59,11 +60,18 @@ void mestreCheckOnline()
         mestre.online = true;
 
         if (mestre.ip != ipMestre)
-            logaM(LOG_AVISO, "Mestre novo IP [%s]", ipMestre.toString().c_str());
+        {
+            String ipStr = utilIPToString(ipMestre);
+            logaM(LOG_AVISO, "Mestre novo IP [%s]", ipStr.c_str());
+        }
         mestre.ip = ipMestre;
 
         mestre.ultimoHeartbeat = millis();
     }
+#else
+    // LibreTiny/LN882H atualmente não implementa
+    // mDNS service discovery.
+#endif
 }
 
 void mestreLoop()

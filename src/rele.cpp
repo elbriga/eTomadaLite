@@ -1,6 +1,4 @@
-#include <Arduino.h>
-#include <ESP8266WebServer.h>
-
+#include "platform.h"
 #include "loga.h"
 #include "rele.h"
 #include "hardwareProfile.h"
@@ -8,7 +6,7 @@
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".RELE..", nivel, fmt, ##__VA_ARGS__)
 
-extern ESP8266WebServer server;
+extern ETomadaWebServer server;
 extern const HardwareProfile hardwareProfile;
 
 bool releLigado = false;

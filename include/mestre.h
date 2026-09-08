@@ -1,7 +1,5 @@
 #pragma once
-#include <Arduino.h>
-#include <ESP8266WiFi.h>
-
+#include "platform.h"
 #include "eventos.h"
 
 struct Mestre

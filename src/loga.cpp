@@ -1,9 +1,7 @@
-#include <Arduino.h>
 #include <stdarg.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
 
 #include "eTomadaLite.h"
+#include "platform.h"
 #include "loga.h"
 
 // Função de log para esta modulo
@@ -210,6 +208,10 @@ bool logaProcessaPop()
     return false;
   }
 
+  // Simplifica a leitura direta do stream:
+  // evita resposta HTTP chunked e encerra a conexão após a resposta.
+  http.useHTTP10(true);
+
   http.setTimeout(1000);
   http.addHeader("Content-Type", "application/json");
 
@@ -226,7 +228,7 @@ bool logaProcessaPop()
   body = F("{\"deviceID\":\"");
   body += eTomadaLiteDeviceID();
   body += F("\",\"timestamp\":");
-  body += log.timestamp;
+  body += (int)log.timestamp;
 
   body += F(",\"uptime\":");
   body += log.uptime;

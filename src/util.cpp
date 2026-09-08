@@ -1,4 +1,5 @@
 #include "eTomadaLite.h"
+#include "platform.h"
 #include "loga.h"
 
 // Função de log para esta modulo
@@ -13,4 +14,22 @@ void utilRestart()
 
   delay(100);
   ESP.reset();
+}
+
+#include "util.h"
+
+String utilIPToString(IPAddress ip)
+{
+  char buffer[16];
+
+  snprintf(
+      buffer,
+      sizeof(buffer),
+      "%u.%u.%u.%u",
+      ip[0],
+      ip[1],
+      ip[2],
+      ip[3]);
+
+  return String(buffer);
 }

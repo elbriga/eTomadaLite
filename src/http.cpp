@@ -1,6 +1,5 @@
-#include <ESP8266WebServer.h>
-
 #include "eTomadaLite.h"
+#include "platform.h"
 #include "loga.h"
 #include "api.h"
 #include "wifi.h"
@@ -10,7 +9,7 @@
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".HTTP..", nivel, fmt, ##__VA_ARGS__)
 
-ESP8266WebServer server(80);
+ETomadaWebServer server(80);
 
 void httpProcessa()
 {

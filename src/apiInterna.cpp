@@ -1,6 +1,5 @@
-#include <ESP8266HTTPClient.h>
-
 #include "eTomadaLite.h"
+#include "platform.h"
 #include "loga.h"
 #include "util.h"
 
@@ -57,11 +56,12 @@ String apiInternaSetRecurso(Recurso *recurso, String estado)
 */
 bool apiInternaEnviaEvento(IPAddress ip, const char *body)
 {
-  int code = apiInterna(ip.toString().c_str(), "evento", body, nullptr);
+  String ipStr = utilIPToString(ip);
+  int code = apiInterna(ipStr.c_str(), "evento", body, nullptr);
   return code == 200;
 }
 
-int apiInterna(const char *host, const char *endpoint, const char *request, char *response)
+int apiInterna(const char *host, const char *endpoint, const char *request, char *responseOut)
 {
   String url = "http://" + String(host) + "/api/" + endpoint;
 
@@ -73,23 +73,85 @@ int apiInterna(const char *host, const char *endpoint, const char *request, char
   if (!http.begin(client, url))
   {
     Serial.println("Nao foi possivel iniciar HTTP para api Interna.");
-    return false;
+    return -1;
   }
 
   http.setTimeout(API_INTERNA_TIMEOUT);
+
+  // Simplifica a leitura direta do stream:
+  // evita resposta HTTP chunked e encerra a conexão após a resposta.
+  http.useHTTP10(true);
+
   if (request)
     http.addHeader("Content-Type", "application/json");
 
   int code = request ? http.POST(request) : http.GET();
 
+  if (responseOut)
+    responseOut[0] = '\0';
+
   if (code == 200)
   {
-    // TODO http.getString() é perigoso !!! usar o stream
-    String respBody = http.getString();
-    logaM(LOG_DEBUG0, " >> RESP: %s", respBody.c_str());
+    char response[API_INTERNA_RESPONSE_MAXLEN] = {0};
 
-    if (response)
-      strlcpy(response, respBody.c_str(), API_INTERNA_RESPONSE_MAXLEN);
+    WiFiClient *stream = http.getStreamPtr();
+
+    if (stream)
+    {
+      size_t pos = 0;
+      int restante = http.getSize();
+
+      uint32_t ultimoDado = millis();
+
+      while (pos < API_INTERNA_RESPONSE_MAXLEN - 1)
+      {
+        int disponivel = stream->available();
+
+        if (disponivel > 0)
+        {
+          size_t tamanho = min(
+              (size_t)disponivel,
+              (size_t)(API_INTERNA_RESPONSE_MAXLEN - 1 - pos));
+
+          if (restante >= 0 && tamanho > (size_t)restante)
+            tamanho = restante;
+
+          if (!tamanho)
+            break;
+
+          size_t lido = stream->readBytes(response + pos, tamanho);
+          if (!lido)
+            break;
+
+          pos += lido;
+
+          if (restante >= 0)
+          {
+            restante -= lido;
+
+            if (!restante)
+              break;
+          }
+
+          ultimoDado = millis();
+          continue;
+        }
+
+        if (restante == 0 || !http.connected())
+          break;
+
+        if (millis() - ultimoDado >= API_INTERNA_TIMEOUT)
+          break;
+
+        delay(1);
+      }
+      response[pos] = '\0';
+
+      logaM(LOG_DEBUG0, " >> RESP: %s", response);
+
+      if (responseOut)
+        strlcpy(responseOut, response, API_INTERNA_RESPONSE_MAXLEN);
+    }
   }
 
   http.end();

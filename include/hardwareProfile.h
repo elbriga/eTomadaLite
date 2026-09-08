@@ -19,6 +19,8 @@ typedef struct
 #include "hardware/miniR1.h"
 #elif defined(HW_SONOFF_MINID1)
 #include "hardware/miniD1.h"
+#elif defined(HW_COZY)
+#include "hardware/cozy.h"
 #else
 #error "Nenhum Hardware Profile definido."
 #endif

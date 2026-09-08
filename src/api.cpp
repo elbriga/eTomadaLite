@@ -1,6 +1,5 @@
-#include <ESP8266WebServer.h>
-
 #include "eTomadaLite.h"
+#include "platform.h"
 #include "loga.h"
 #include "rele.h"
 #include "config.h"
@@ -9,7 +8,7 @@
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..API..", nivel, fmt, ##__VA_ARGS__)
 
-extern ESP8266WebServer server;
+extern ETomadaWebServer server;
 extern Config config;
 
 void apiGetSnapshot()
@@ -40,7 +39,7 @@ void apiGetSnapshot()
   resposta += WiFi.macAddress();
 
   resposta += F("\",\"ip\":\"");
-  resposta += WiFi.localIP().toString();
+  resposta += utilIPToString(WiFi.localIP());
 
   resposta += F("\",\"ssid\":\"");
   resposta += WiFi.SSID();

@@ -37,8 +37,10 @@ void appInit()
 
   logaM(LOG_NORMAL, "Chip ID: %08X", ESP.getChipId());
   logaM(LOG_NORMAL, "Flash: %u bytes", ESP.getFlashChipSize());
+#if defined(ESP8266)
   logaM(LOG_NORMAL, "Sketch: %u bytes", ESP.getSketchSize());
   logaM(LOG_NORMAL, "Free sketch: %u bytes", ESP.getFreeSketchSpace());
+#endif
 
   // Hardware
   ledInit();

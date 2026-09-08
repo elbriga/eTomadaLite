@@ -1,12 +1,18 @@
 #include <Arduino.h>
+
+#include "platform.h"
+
+#if defined(ESP8266)
 #include <EEPROM.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
+#else
+#include <Flash.h>
+#endif
 
 #include "recovery.h"
 #include "config.h"
 #include "ota.h"
 #include "hardwareProfile.h"
+#include "util.h"
 
 // ============================================================
 // Config
@@ -26,13 +32,20 @@
 // Externos
 // ============================================================
 
-extern ESP8266WebServer server;
+extern ETomadaWebServer server;
 extern Config config;
 extern const HardwareProfile hardwareProfile;
 
 // ============================================================
 // Storage
 // ============================================================
+
+#define RECOVERY_STORAGE_MAGIC 0x52454356UL // "RECV"
+
+#if defined(ESP8266)
+
+// ESP8266 usa EEPROM emulada.
+// A área do recovery fica separada da Config.
 
 struct RecoveryStorage
 {
@@ -50,6 +63,24 @@ static_assert(
         ETOMADA_LITE_EEPROM_SIZE,
     "RecoveryStorage nao cabe na EEPROM");
 
+#else
+
+// LN882H:
+//
+// Flash física: 2 MiB
+// User Data:    0x1EC000 - 0x200000
+//
+// Reservamos o último setor de 4 KiB exclusivamente para
+// o contador de boot do recovery.
+
+#define RECOVERY_FLASH_ADDR 0x1FF000
+#define RECOVERY_FLASH_SIZE 0x1000
+
+#define RECOVERY_REC_BOOT 0x424F4F54UL // "BOOT"
+#define RECOVERY_REC_OK 0x4F4B4F4BUL   // "OKOK"
+
+#endif
+
 // ============================================================
 // Estado
 // ============================================================
@@ -65,7 +96,7 @@ static bool ledUltimoEstado = false;
 // ============================================================
 // Storage
 // ============================================================
-
+#if defined(ESP8266)
 static void recoveryStorageRead(RecoveryStorage &storage)
 {
     EEPROM.get(
@@ -88,6 +119,88 @@ static bool recoveryStorageWrite(const RecoveryStorage &storage)
 
     return EEPROM.commit();
 }
+#else // LN882H
+static bool recoveryStorageScan(uint32_t &proximoOffset, uint8_t &boots)
+{
+    boots = 0;
+
+    for (
+        uint32_t offset = 0;
+        offset < RECOVERY_FLASH_SIZE;
+        offset += sizeof(uint32_t))
+    {
+        uint32_t valor;
+
+        if (!Flash.readBlock(
+                RECOVERY_FLASH_ADDR + offset,
+                (uint8_t *)&valor,
+                sizeof(valor)))
+        {
+            return false;
+        }
+
+        // Primeiro slot ainda não gravado.
+        if (valor == 0xFFFFFFFF)
+        {
+            proximoOffset = offset;
+            return true;
+        }
+
+        if (valor == RECOVERY_REC_BOOT)
+        {
+            if (boots < 255)
+                boots++;
+
+            continue;
+        }
+
+        if (valor == RECOVERY_REC_OK)
+        {
+            boots = 0;
+            continue;
+        }
+
+        // Conteúdo desconhecido/corrompido.
+        return false;
+    }
+
+    // Setor cheio.
+    proximoOffset = RECOVERY_FLASH_SIZE;
+
+    return true;
+}
+
+static bool recoveryStorageAppend(uint32_t valor)
+{
+    uint32_t offset;
+    uint8_t boots;
+
+    if (!recoveryStorageScan(offset, boots))
+    {
+        Serial.println("Recovery storage invalido, apagando");
+
+        if (!Flash.eraseSector(RECOVERY_FLASH_ADDR))
+            return false;
+
+        offset = 0;
+    }
+
+    if (offset >= RECOVERY_FLASH_SIZE)
+    {
+        Serial.println("Recovery storage cheio, apagando");
+
+        if (!Flash.eraseSector(RECOVERY_FLASH_ADDR))
+            return false;
+
+        offset = 0;
+    }
+
+    return Flash.writeBlock(
+        RECOVERY_FLASH_ADDR + offset,
+        (const uint8_t *)&valor,
+        sizeof(valor));
+}
+#endif
 
 // ============================================================
 // Boot recovery
@@ -95,6 +208,8 @@ static bool recoveryStorageWrite(const RecoveryStorage &storage)
 
 bool recoveryBoot()
 {
+#if defined(ESP8266)
+
     EEPROM.begin(ETOMADA_LITE_EEPROM_SIZE);
 
     RecoveryStorage storage;
@@ -129,6 +244,59 @@ bool recoveryBoot()
         return false;
     }
 
+#else
+
+    // Este endereço reservado só é válido para o layout
+    // generic-ln882h com flash física de 2 MiB.
+    if (Flash.getSize() != 0x200000)
+    {
+        Serial.printf(
+            "Flash inesperada: %u bytes - recovery boot desativado\n",
+            Flash.getSize());
+
+        return false;
+    }
+
+    uint32_t offset;
+    uint8_t boots;
+
+    if (!recoveryStorageScan(offset, boots))
+    {
+        Serial.println("Inicializando recovery storage");
+
+        if (!Flash.eraseSector(RECOVERY_FLASH_ADDR))
+        {
+            Serial.println("Erro apagando recovery storage");
+            return false;
+        }
+
+        boots = 0;
+    }
+
+    boots++;
+
+    Serial.printf("Recovery boot: %u/%u\n", boots, RECOVERY_BOOT_COUNT);
+
+    if (!recoveryStorageAppend(RECOVERY_REC_BOOT))
+    {
+        Serial.println("Erro gravando contador de recovery");
+        return false;
+    }
+
+    if (boots >= RECOVERY_BOOT_COUNT)
+    {
+        Serial.println("Entrando em modo recovery");
+
+        // Encerra a sequência.
+        // Depois de OTA/reboot, próximo boot começa novamente em 1.
+        if (!recoveryStorageAppend(RECOVERY_REC_OK))
+            Serial.println("Erro encerrando sequencia de recovery");
+
+        return true;
+    }
+
+#endif
+
     bootAguardandoOK = true;
     bootInicio = millis();
 
@@ -143,6 +311,8 @@ void recoveryBootTick()
 
     if (millis() - bootInicio < RECOVERY_BOOT_TIMEOUT)
         return;
+
+#if defined(ESP8266)
 
     RecoveryStorage storage;
 
@@ -163,6 +333,16 @@ void recoveryBootTick()
         resetBootsPendente = false;
         Serial.println("Boot confirmado");
     }
+#else
+    if (!recoveryStorageAppend(RECOVERY_REC_OK))
+    {
+        Serial.println("ERRO confirmando boot. Tentar de novo em 10 segundos");
+        bootInicio = millis();
+        return;
+    }
+
+    Serial.println("Boot confirmado");
+#endif
 
     bootAguardandoOK = false;
 }
@@ -316,7 +496,7 @@ static void recoveryHttpInit()
             resposta += ssid;
 
             resposta += F("\",\"ip\":\"");
-            resposta += ip.toString();
+            resposta += utilIPToString(ip);
 
             resposta += F("\",\"rssi\":");
             resposta += modoAP ? 0 : WiFi.RSSI();

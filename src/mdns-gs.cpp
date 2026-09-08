@@ -1,7 +1,7 @@
-#include <ESP8266mDNS.h>
-
 #include "eTomadaLite.h"
+#include "platform.h"
 #include "loga.h"
+#include "util.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".MDNS..", nivel, fmt, ##__VA_ARGS__)
@@ -20,10 +20,12 @@ void mdnsInit()
             return;
         }
 
+        String ipStr = utilIPToString(WiFi.localIP());
+
         MDNS.addServiceTxt("etomada", "tcp", "device", "eTomada");
         MDNS.addServiceTxt("etomada", "tcp", "id", hostname.c_str());
         MDNS.addServiceTxt("etomada", "tcp", "ssid", WiFi.SSID().c_str());
-        MDNS.addServiceTxt("etomada", "tcp", "ip", WiFi.localIP().toString().c_str());
+        MDNS.addServiceTxt("etomada", "tcp", "ip", ipStr.c_str());
         MDNS.addServiceTxt("etomada", "tcp", "mac", WiFi.macAddress().c_str());
         MDNS.addServiceTxt("etomada", "tcp", "model", eTomadaLiteDeviceModel().c_str());
         MDNS.addServiceTxt("etomada", "tcp", "board", eTomadaLiteDeviceBoard().c_str());
@@ -38,5 +40,5 @@ void mdnsInit()
 
 void mdnsProcessa()
 {
-    MDNS.update();
+    platformMDNSUpdate();
 }

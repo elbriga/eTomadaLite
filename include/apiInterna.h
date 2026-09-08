@@ -1,4 +1,4 @@
 #pragma once
-#include <ESP8266WiFi.h>
+#include "platform.h"
 
 bool apiInternaEnviaEvento(IPAddress ip, const char *body);
