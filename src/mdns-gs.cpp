@@ -20,12 +20,13 @@ void mdnsInit()
             return;
         }
 
-        String ipStr = utilIPToString(WiFi.localIP());
+        char ipStr[16];
+        utilIPToString(WiFi.localIP(), ipStr, 16);
 
         MDNS.addServiceTxt("etomada", "tcp", "device", "eTomada");
         MDNS.addServiceTxt("etomada", "tcp", "id", hostname.c_str());
         MDNS.addServiceTxt("etomada", "tcp", "ssid", WiFi.SSID().c_str());
-        MDNS.addServiceTxt("etomada", "tcp", "ip", ipStr.c_str());
+        MDNS.addServiceTxt("etomada", "tcp", "ip", (const char *)ipStr);
         MDNS.addServiceTxt("etomada", "tcp", "mac", WiFi.macAddress().c_str());
         MDNS.addServiceTxt("etomada", "tcp", "model", eTomadaLiteDeviceModel().c_str());
         MDNS.addServiceTxt("etomada", "tcp", "board", eTomadaLiteDeviceBoard().c_str());

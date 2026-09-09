@@ -473,55 +473,40 @@ void recoveryAPIRegister()
 
 static void recoveryHttpInit()
 {
-    server.on(
-        "/api/status",
-        HTTP_GET,
-        []()
-        {
-            IPAddress ip =
-                modoAP
-                    ? WiFi.softAPIP()
-                    : WiFi.localIP();
+    server.on("/api/status", HTTP_GET,
+              []()
+              {
+                  IPAddress ip = modoAP ? WiFi.softAPIP() : WiFi.localIP();
+                  char ipStr[16];
+                  utilIPToString(ip, ipStr, 16);
 
-            String ssid =
-                modoAP
-                    ? apSSID
-                    : WiFi.SSID();
+                  String ssid = modoAP ? apSSID : WiFi.SSID();
 
-            String resposta;
+                  String resposta;
+                  resposta.reserve(192);
 
-            resposta.reserve(192);
+                  resposta = F("{\"mode\":\"recovery\",\"ssid\":\"");
+                  resposta += ssid;
 
-            resposta = F("{\"mode\":\"recovery\",\"ssid\":\"");
-            resposta += ssid;
+                  resposta += F("\",\"ip\":\"");
+                  resposta += ipStr;
 
-            resposta += F("\",\"ip\":\"");
-            resposta += utilIPToString(ip);
+                  resposta += F("\",\"rssi\":");
+                  resposta += modoAP ? 0 : WiFi.RSSI();
 
-            resposta += F("\",\"rssi\":");
-            resposta += modoAP ? 0 : WiFi.RSSI();
+                  resposta += F(",\"uptime\":");
+                  resposta += millis();
 
-            resposta += F(",\"uptime\":");
-            resposta += millis();
+                  resposta += "}";
 
-            resposta += "}";
+                  server.send(200, "application/json", resposta);
+              });
 
-            server.send(
-                200,
-                "application/json",
-                resposta);
-        });
-
-    server.on(
-        "/",
-        HTTP_GET,
-        []()
-        {
-            server.send(
-                200,
-                "text/plain",
-                "eTomada Lite Recovery");
-        });
+    server.on("/", HTTP_GET,
+              []()
+              {
+                  server.send(200, "text/plain", "eTomada Lite Recovery");
+              });
 
     recoveryAPIRegister();
 

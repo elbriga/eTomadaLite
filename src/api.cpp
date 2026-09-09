@@ -39,7 +39,9 @@ void apiGetSnapshot()
   resposta += WiFi.macAddress();
 
   resposta += F("\",\"ip\":\"");
-  resposta += utilIPToString(WiFi.localIP());
+  char ipBuffer[16];
+  utilIPToString(WiFi.localIP(), ipBuffer, 16);
+  resposta += ipBuffer;
 
   resposta += F("\",\"ssid\":\"");
   resposta += WiFi.SSID();

@@ -56,8 +56,9 @@ String apiInternaSetRecurso(Recurso *recurso, String estado)
 */
 bool apiInternaEnviaEvento(IPAddress ip, const char *body)
 {
-  String ipStr = utilIPToString(ip);
-  int code = apiInterna(ipStr.c_str(), "evento", body, nullptr);
+  char ipStr[16];
+  utilIPToString(ip, ipStr, 16);
+  int code = apiInterna(ipStr, "evento", body, nullptr);
   return code == 200;
 }
 

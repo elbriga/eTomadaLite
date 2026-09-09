@@ -18,12 +18,8 @@ void utilRestart(const char *porque)
 
 #include "util.h"
 
-String utilIPToString(IPAddress ip)
+void utilIPToString(IPAddress ip, char *out, size_t maxlen)
 {
-  char buffer[16];
-  snprintf(buffer, sizeof(buffer),
-           "%u.%u.%u.%u",
+  snprintf(out, maxlen, "%u.%u.%u.%u",
            ip[0], ip[1], ip[2], ip[3]);
-
-  return String(buffer);
 }

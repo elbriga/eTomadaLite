@@ -28,8 +28,9 @@ void wifiStartAP()
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAP(apName.c_str());
 
-  String ipStr = utilIPToString(WiFi.softAPIP());
-  logaM(LOG_AVISO, "AP IP: %s", ipStr.c_str());
+  char ipStr[16];
+  utilIPToString(WiFi.softAPIP(), ipStr, 16);
+  logaM(LOG_AVISO, "AP IP: %s", ipStr);
 }
 
 void wifiConnect()
@@ -58,8 +59,9 @@ void wifiConnect()
   if (WiFi.status() == WL_CONNECTED)
   {
     logaM(LOG_NORMAL, "WiFi conectado!");
-    String ipStr = utilIPToString(WiFi.localIP());
-    logaM(LOG_NORMAL, "IP: %s", ipStr.c_str());
+    char ipStr[16];
+    utilIPToString(WiFi.localIP(), ipStr, 16);
+    logaM(LOG_NORMAL, "IP: %s", ipStr);
   }
   else
   {

@@ -61,8 +61,9 @@ void mestreCheckOnline()
 
         if (mestre.ip != ipMestre)
         {
-            String ipStr = utilIPToString(ipMestre);
-            logaM(LOG_AVISO, "Mestre novo IP [%s]", ipStr.c_str());
+            char ipStr[16];
+            utilIPToString(ipMestre, ipStr, 16);
+            logaM(LOG_AVISO, "Mestre novo IP [%s]", ipStr);
         }
         mestre.ip = ipMestre;
 

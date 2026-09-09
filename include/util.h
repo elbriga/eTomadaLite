@@ -1,5 +1,5 @@
 #pragma once
-#include <Arduino.h>
+#include "platform.h"
 
 void utilRestart(const char *porque);
-String utilIPToString(IPAddress ip);
+void utilIPToString(IPAddress ip, char *out, size_t maxlen);
