@@ -49,7 +49,7 @@ void wifiConnect()
   WiFi.begin(config.ssid, config.senha);
 
   unsigned long inicio = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - inicio < 15000)
+  while ((WiFi.status() != WL_CONNECTED || !wifiTemIP()) && millis() - inicio < 15000)
   {
     delay(100);
     Serial.print(".");
@@ -99,4 +99,14 @@ void apiConfigWifi()
   delay(100);
 
   wifiConnect();
+}
+
+bool wifiTemIP()
+{
+  IPAddress ip = WiFi.localIP();
+
+  return ip[0] != 0 ||
+         ip[1] != 0 ||
+         ip[2] != 0 ||
+         ip[3] != 0;
 }

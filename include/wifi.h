@@ -4,3 +4,4 @@ void wifiStartAP();
 void wifiConnect();
 bool wifiGetModoAP();
 void apiConfigWifi();
+bool wifiTemIP();
