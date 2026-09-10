@@ -25,8 +25,7 @@ void httpInit()
 {
   server.on("/api/getSnapshot", HTTP_GET, apiGetSnapshot);
 
-  server.on("/api/configWifi", HTTP_GET, apiConfigWifi);
-  server.on("/api/configHostname", HTTP_GET, apiConfigHostname);
+  server.on("/api/config", HTTP_GET, apiConfig);
 
   server.on("/api/setRele", HTTP_GET, apiSetRele);
 

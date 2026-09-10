@@ -1,5 +1,5 @@
 #pragma once
 
 void apiGetSnapshot();
-void apiConfigHostname();
+void apiConfig();
 void apiReset();

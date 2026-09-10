@@ -4,6 +4,8 @@
 #include "rele.h"
 #include "config.h"
 #include "util.h"
+#include "wifi.h"
+#include "mestre.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..API..", nivel, fmt, ##__VA_ARGS__)
@@ -54,22 +56,67 @@ void apiGetSnapshot()
   server.send(200, "application/json", resposta);
 }
 
-void apiConfigHostname()
+void apiConfig()
 {
-  if (!server.hasArg("id"))
+  if (server.hasArg("hostname"))
   {
-    server.send(400, "application/json", R"({"ok":false,"msg":"missing id"})");
+    String devID = server.arg("hostname");
+    // TODO :: limpar string
+    strlcpy(config.deviceID, devID.c_str(), sizeof(config.deviceID));
+
+    configSave();
+
+    server.send(200, "application/json", R"({"ok":true,"msg":"hostname configurado"})");
+    logaM(LOG_NORMAL, "Hostname configurado. Reconectar");
+
+    delay(100);
+    wifiConnect();
+  }
+  else if (server.hasArg("ssid") && server.hasArg("senha"))
+  {
+    String ssid = server.arg("ssid");
+    String senha = server.arg("senha");
+
+    strlcpy(config.ssid, ssid.c_str(), sizeof(config.ssid));
+    strlcpy(config.senha, senha.c_str(), sizeof(config.senha));
+
+    configSave();
+
+    server.send(200, "application/json", R"({"ok":true,"msg":"wifi configurado > reconectar"})");
+    logaM(LOG_NORMAL, "WiFi configurado. Reconectar");
+
+    delay(100);
+    wifiConnect();
+  }
+  else if (server.hasArg("logLevel"))
+  {
+    int level = server.arg("logLevel").toInt();
+    if (level != config.logLevel)
+    {
+      config.logLevel = logaSetLevel((LogLevel)level);
+      configSave();
+    }
+    server.send(200, "application/json", R"({"ok":true,"msg":"logLevel configurado"})");
+    logaM(LOG_NORMAL, "Log Level setado para [%s]", logaGetNivelTxt((LogLevel)config.logLevel));
+  }
+  else if (server.hasArg("mestre"))
+  {
+    String mestre = server.arg("mestre");
+    // TODO :: limpar string
+    strlcpy(config.mestre, mestre.c_str(), sizeof(config.mestre));
+
+    configSave();
+
+    server.send(200, "application/json", R"({"ok":true,"msg":"mestre configurado"})");
+    logaM(LOG_NORMAL, "Mestre configurado. Reinit mestre");
+
+    mestreInit();
+  }
+  else
+  {
+    server.send(400, "application/json", R"({"ok":false,"msg":"missing args"})");
     return;
   }
-
-  String devID = server.arg("id");
-  // TODO :: limpar string
-
-  strlcpy(config.deviceID, devID.c_str(), sizeof(config.deviceID));
-
-  configSave();
-
-  server.send(200, "application/json", R"({"ok":true,"msg":"hostname configurado"})");
 }
 
 void apiReset()

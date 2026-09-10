@@ -43,7 +43,7 @@ void wifiConnect()
   }
 
   logaM(LOG_NORMAL, "Conectando em: %s", config.ssid);
-
+  WiFi.disconnect();
   WiFi.mode(WIFI_STA);
   WiFi.hostname(config.deviceID);
   WiFi.begin(config.ssid, config.senha);
@@ -68,37 +68,6 @@ void wifiConnect()
     logaM(LOG_AVISO, "Falha ao conectar.");
     wifiStartAP();
   }
-}
-
-void apiConfigWifi()
-{
-  if (!server.hasArg("ssid"))
-  {
-    server.send(400, "application/json", R"({"ok":false,"msg":"missing ssid"})");
-    return;
-  }
-
-  if (!server.hasArg("senha"))
-  {
-    server.send(400, "application/json", R"({"ok":false,"msg":"missing senha"})");
-    return;
-  }
-
-  String ssid = server.arg("ssid");
-  String senha = server.arg("senha");
-
-  strlcpy(config.ssid, ssid.c_str(), sizeof(config.ssid));
-  strlcpy(config.senha, senha.c_str(), sizeof(config.senha));
-
-  configSave();
-
-  server.send(200, "application/json", R"({"ok":true,"msg":"wifi configurado"})");
-
-  delay(100);
-  WiFi.disconnect();
-  delay(100);
-
-  wifiConnect();
 }
 
 bool wifiTemIP()
