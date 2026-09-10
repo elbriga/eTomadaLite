@@ -36,8 +36,8 @@ void mestreCheckOnline()
         return;
 
     // Procurar nosso mestre
-    // Suporte para queryHost e queryService adicionado no LibreTiny
-    // Suporte para queryHost adicionado no esp8266/Arduino
+    // Suporte para queryHost e queryService adicionado na minha versão do LibreTiny
+    // Suporte para queryHost adicionado na minha versão do framework-arduinoespressif8266
     IPAddress ipMestre = MDNS.queryHost(mestre.deviceID);
 
     if (ipMestre != IPAddress(0, 0, 0, 0))
