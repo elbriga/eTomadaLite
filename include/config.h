@@ -18,6 +18,8 @@ struct Config
 
   char deviceID[32];
   char mestre[32];
+
+  int logLevel;
 }; // 132 bytes
 
 bool configLoad();

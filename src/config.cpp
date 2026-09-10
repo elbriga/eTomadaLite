@@ -70,9 +70,11 @@ void configDefaults()
 
   config.magic = ETOMADA_LITE_CONFIG_MAGIC;
   strlcpy(config.deviceID, "etomada-lite", sizeof(config.deviceID));
+  config.logLevel = LOG_NORMAL;
 
   // TESTES
-  // strlcpy(config.deviceID, "COZY", sizeof(config.deviceID));
+  // config.logLevel = LOG_DEBUG;
+  // strlcpy(config.deviceID, "DEV", sizeof(config.deviceID));
   // strlcpy(config.mestre, "GROW", sizeof(config.mestre));
   // strlcpy(config.ssid, "GLS", sizeof(config.ssid));
   // strlcpy(config.senha, "Lola09876543*", sizeof(config.senha));
@@ -96,6 +98,8 @@ bool configLoad()
     logaM(LOG_AVISO, "Configuracao inexistente. Carregando Defaults");
     configDefaults();
   }
+
+  logaSetLevel((LogLevel)config.logLevel);
 
   logaM(LOG_NORMAL, "Configuracao carregada.");
   logaM(LOG_NORMAL, "ID: %s", config.deviceID);

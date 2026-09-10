@@ -7,7 +7,7 @@
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".LOGS..", nivel, fmt, ##__VA_ARGS__)
 
-LogLevel logLevel = LOG_DEBUG;
+static LogLevel logLevel = LOG_DEBUG;
 
 #define LOG_MESSAGE_SIZE 256
 
@@ -52,6 +52,28 @@ void loga(const char *modulo, LogLevel nivel, const char *fmt, ...)
   logaV(modulo, nivel, fmt, args);
 
   va_end(args);
+}
+
+LogLevel logaSetLevel(LogLevel level)
+{
+  // Garantir que esta dentro do nosso enum
+  switch (level)
+  {
+  case LOG_DESATIVADO:
+  case LOG_CRITICO:
+  case LOG_AVISO:
+  case LOG_NORMAL:
+  case LOG_DEBUG0:
+  case LOG_DEBUG:
+  case LOG_TESTE:
+    logLevel = level;
+    break;
+
+  default:
+    logLevel = LOG_NORMAL;
+  }
+
+  return logLevel;
 }
 
 static bool logQueuePush(const LogRemoto &log)
