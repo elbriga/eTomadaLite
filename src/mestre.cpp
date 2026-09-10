@@ -35,25 +35,12 @@ void mestreCheckOnline()
     if (!mestreAtivo())
         return;
 
-#if defined(ESP8266)
-    // Escanear
-    int totND = MDNS.queryService("etomada", "tcp");
-
-    // logaM(LOG_AVISO, "totND: %d", totND);
-
     // Procurar nosso mestre
-    String mestreFQDN = mestre.deviceID + ".local";
-    IPAddress ipMestre = IPAddress(0, 0, 0, 0);
-    for (int nd = 0; nd < totND; nd++)
-    {
-        // logaM(LOG_AVISO, "[%d]: %s == %s", nd, MDNS.hostname(nd).c_str(), mestre.deviceID.c_str());
-        if (MDNS.hostname(nd) == mestreFQDN)
-        {
-            ipMestre = MDNS.IP(nd);
-            break;
-        }
-    }
-    if (ipMestre)
+    // Suporte para queryHost e queryService adicionado no LibreTiny
+    // Suporte para queryHost adicionado no esp8266/Arduino
+    IPAddress ipMestre = MDNS.queryHost(mestre.deviceID);
+
+    if (ipMestre != IPAddress(0, 0, 0, 0))
     {
         if (!mestre.online)
             logaM(LOG_AVISO, "Mestre Online!");
@@ -69,10 +56,6 @@ void mestreCheckOnline()
 
         mestre.ultimoHeartbeat = millis();
     }
-#else
-    // LibreTiny/LN882H atualmente não implementa
-    // mDNS service discovery.
-#endif
 }
 
 void mestreLoop()
