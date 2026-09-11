@@ -40,22 +40,29 @@ void mestreCheckOnline()
     // Suporte para queryHost adicionado na minha versão do framework-arduinoespressif8266
     IPAddress ipMestre = MDNS.queryHost(mestre.deviceID);
 
-    if (ipMestre != IPAddress(0, 0, 0, 0))
+    if (!ipMestre)
     {
-        if (!mestre.online)
-            logaM(LOG_AVISO, "Mestre Online!");
-        mestre.online = true;
-
-        if (mestre.ip != ipMestre)
+        logaM(LOG_AVISO, "Mestre não respondeu o mDNS");
+        if (mestre.ip)
         {
-            char ipStr[16];
-            utilIPToString(ipMestre, ipStr, 16);
-            logaM(LOG_AVISO, "Mestre novo IP [%s]", ipStr);
+            // TODO : ping?
         }
-        mestre.ip = ipMestre;
-
-        mestre.ultimoHeartbeat = millis();
+        return;
     }
+
+    if (!mestre.online)
+        logaM(LOG_AVISO, "Mestre Online!");
+    mestre.online = true;
+
+    if (mestre.ip != ipMestre)
+    {
+        char ipStr[16];
+        utilIPToString(ipMestre, ipStr, 16);
+        logaM(LOG_AVISO, "Mestre novo IP [%s]", ipStr);
+    }
+    mestre.ip = ipMestre;
+
+    mestre.ultimoHeartbeat = millis();
 }
 
 void mestreLoop()
@@ -71,7 +78,7 @@ void mestreLoop()
     }
 }
 
-void mestreEnviaEvento(TipoEvento tipoEvento, const char *device)
+void mestreEnviaEvento(TipoEvento tipoEvento, const char *id, const char *deviceJson)
 {
     if (!mestreAtivo()) // Sem mestre retorna
         return;
@@ -96,18 +103,18 @@ void mestreEnviaEvento(TipoEvento tipoEvento, const char *device)
 
     body = F("{\"origem\":\"");
     body += eTomadaLiteDeviceID();
-    body += F("\",\"id\":\"B1\"");
 
-    body += F(",\"timestamp\":");
+    body += F("\",\"id\":\"");
+    body += id;
+
+    body += F("\",\"timestamp\":");
     body += (unsigned long)now;
 
     body += F(",\"evento\":\"");
     body += eventoGetTipoTxt(tipoEvento);
 
     body += F("\",\"device\":{");
-
-    body += device;
-
+    body += deviceJson;
     body += F("}}");
 
     apiInternaEnviaEvento(mestre.ip, body.c_str());
