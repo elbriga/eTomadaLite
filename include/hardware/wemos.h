@@ -1,6 +1,7 @@
 #pragma once
 #include "hardwareProfile.h"
 
+// config do agua-quarto wemos
 const HardwareProfile hardwareProfile = {
     .modelo = "R1S1",
     .board = "d1_mini",
