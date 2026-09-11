@@ -8,7 +8,14 @@ typedef struct
     int ledPin;
     bool ledInvertido;
     int relePin;
+    bool releInvertido;
     int botaoPin;
+    struct
+    {
+        int pin;
+        int debounceMS;
+    } sensorDigital;
+
 } HardwareProfile;
 
 #ifdef HW_DEV

@@ -75,7 +75,7 @@ void botaoProcessa()
       String device = F("\"estado\":");
       device += leitura ? "true" : "false";
 
-      mestreEnviaEvento(EVENTO_TOGGLE, device.c_str());
+      mestreEnviaEvento(EVENTO_TOGGLE, "B1", device.c_str());
 
       /*
       eventoPost(botao->estado ? EVENTO_LIGOU : EVENTO_DESLIGOU, atual[rb].rec, true, true);

@@ -7,5 +7,10 @@ const HardwareProfile hardwareProfile = {
     .ledPin = 13,
     .ledInvertido = true,
     .relePin = 12,
+    .releInvertido = false,
     .botaoPin = 255,
+    .sensorDigital = {
+        .pin = 255,
+        .debounceMS = 0,
+    },
 };

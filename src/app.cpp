@@ -11,6 +11,7 @@
 #include "mestre.h"
 #include "botao.h"
 #include "ntp.h"
+#include "sensor.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..APP..", nivel, fmt, ##__VA_ARGS__)
@@ -46,6 +47,7 @@ void appInit()
   ledInit();
   releInit();
   botoesInit();
+  sensorDigitalInit();
 
   wifiConnect();
   modoAP = wifiGetModoAP();
@@ -79,6 +81,8 @@ void appLoop()
     if (!modoAP)
       mestreLoop();
 
+    sensorDigitalProcessa();
+
     // 10s/10s
     if (ultimo10s != timeinfo.tm_sec / 10)
     {
@@ -94,18 +98,6 @@ void appLoop()
       memoriaLog("1h/1h");
       tsTimerHora = now;
     }
-
-    // {
-    //   int sensor = analogRead(A0);
-    //   logaM(LOG_NORMAL, "======================");
-    //   logaM(LOG_NORMAL, "A0: %d", sensor);
-    //   logaM(LOG_NORMAL, "D5: %d", digitalRead(D5));
-    //   logaM(LOG_NORMAL, "======================");
-    //   if (sensor < 400)
-    //     digitalWrite(15, 1);
-    //   else
-    //     digitalWrite(15, 0);
-    // }
   }
 
   // 5ms/5ms
