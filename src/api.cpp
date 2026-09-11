@@ -6,6 +6,7 @@
 #include "util.h"
 #include "wifi.h"
 #include "mestre.h"
+#include "sensor.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..API..", nivel, fmt, ##__VA_ARGS__)
@@ -34,9 +35,6 @@ void apiGetSnapshot()
   resposta += F("\",\"uptime\":");
   resposta += millis();
 
-  resposta += F(",\"rele\":");
-  resposta += releGetEstado() ? "1" : "0";
-
   resposta += F(",\"mac\":\"");
   resposta += WiFi.macAddress();
 
@@ -51,7 +49,17 @@ void apiGetSnapshot()
   resposta += F("\",\"wifiPower\":");
   resposta += String(WiFi.RSSI());
 
-  resposta += F("}");
+  resposta += F(",\"recursos\":[");
+
+  resposta += F("{\"id\":\"R1\",\"device\":{\"estado\":");
+  resposta += releGetEstado() ? "1" : "0";
+  resposta += F("}},");
+
+  resposta += F("{\"id\":\"S1\",\"device\":{\"valor\":");
+  resposta += sensorDigitalGetEstado() ? "1" : "0";
+  resposta += F("}}");
+
+  resposta += F("]}");
 
   server.send(200, "application/json", resposta);
 }

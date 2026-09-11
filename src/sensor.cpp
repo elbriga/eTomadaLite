@@ -38,6 +38,11 @@ bool sensorDigitalAtivo()
     return hardwareProfile.sensorDigital.pin != 255;
 }
 
+bool sensorDigitalGetEstado()
+{
+    return sensorDigital.estado;
+}
+
 // Chamado a cada segundo
 void sensorDigitalProcessa()
 {

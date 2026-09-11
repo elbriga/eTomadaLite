@@ -36,7 +36,7 @@ void appInit()
   logaM(LOG_NORMAL, "Hostname: %s", eTomadaLiteDeviceID().c_str());
   logaM(LOG_NORMAL, "Versao: %s", eTomadaLiteVersion().c_str());
 
-  logaM(LOG_NORMAL, "Chip ID: %08X", ESP.getChipId());
+  logaM(LOG_NORMAL, "MAC: %s", WiFi.macAddress().c_str());
   logaM(LOG_NORMAL, "Flash: %u bytes", ESP.getFlashChipSize());
 #if defined(ESP8266)
   logaM(LOG_NORMAL, "Sketch: %u bytes", ESP.getSketchSize());
