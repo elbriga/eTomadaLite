@@ -21,9 +21,10 @@ void releSet(bool ligado)
 {
   releLigado = ligado;
 
-  digitalWrite(hardwareProfile.relePin, ligado);
+  digitalWrite(hardwareProfile.relePin,
+               hardwareProfile.releInvertido ? !ligado : ligado);
 
-  logaM(LOG_NORMAL, "Rele: %s", ligado ? "ON" : "OFF");
+  logaM(LOG_DEBUG0, "Rele: %s", ligado ? "ON" : "OFF");
 }
 
 bool releGetEstado()
@@ -31,7 +32,22 @@ bool releGetEstado()
   return releLigado;
 }
 
-void apiSetRele()
+void apiRele(bool estado)
+{
+  logaM(LOG_NORMAL, "API set rele: %s", (estado ? "ON" : "OFF"));
+
+  releSet(estado);
+
+  String resposta;
+  resposta.reserve(64);
+  resposta = F("{\"ok\":true,\"rele\":");
+  resposta += releLigado ? "1" : "0";
+  resposta += "}";
+
+  server.send(200, "application/json", resposta);
+}
+
+void apiReleSet()
 {
   if (!server.hasArg("estado"))
   {
@@ -47,15 +63,10 @@ void apiSetRele()
       estado == "ON" ||
       estado == "true";
 
-  releSet(ligado);
+  apiRele(ligado);
+}
 
-  String resposta;
-
-  resposta.reserve(64);
-
-  resposta = F("{\"ok\":true,\"rele\":");
-  resposta += releLigado ? "1" : "0";
-  resposta += "}";
-
-  server.send(200, "application/json", resposta);
+void apiReleToggle()
+{
+  apiRele(!releLigado);
 }

@@ -3,4 +3,5 @@
 void releInit();
 void releSet(bool ligado);
 bool releGetEstado();
-void apiSetRele();
+void apiReleSet();
+void apiReleToggle();
