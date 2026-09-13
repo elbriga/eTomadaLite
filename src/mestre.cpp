@@ -7,30 +7,38 @@
 #include "apiInterna.h"
 #include "wifi.h"
 #include "util.h"
+#include "sensor.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("MESTRE.", nivel, fmt, ##__VA_ARGS__)
 
-Mestre mestre;
+Mestre mestre = {};
 
 #define MESTRE_HEARTBEAT_TIMEOUT 30000
 
 extern Config config;
 
+bool mestreAtivo()
+{
+    return (mestre.deviceID != "");
+}
+
 void mestreInit()
 {
     mestre.deviceID = String(config.mestre);
-    mestre.ip = IPAddress(0, 0, 0, 0);
-    mestre.ultimoHeartbeat = 0;
-    mestre.online = false;
+    mestre.ip = IPAddress();
 
-    if (mestreAtivo())
-        logaM(LOG_AVISO, "Nodo Mestre: %s", mestre.deviceID.c_str());
+    if (!mestreAtivo())
+        return;
 
-    mestreCheckOnline();
+    logaM(LOG_AVISO, "Nodo Mestre: %s", mestre.deviceID.c_str());
+    mestreCheckIP();
+
+    if (mestre.ip)
+        sensorDigitalEnviaEvento();
 }
 
-void mestreCheckOnline()
+void mestreCheckIP()
 {
     if (!mestreAtivo())
         return;
@@ -39,10 +47,9 @@ void mestreCheckOnline()
     // Suporte para queryHost e queryService adicionado na minha versão do LibreTiny
     // Suporte para queryHost adicionado na minha versão do framework-arduinoespressif8266
     IPAddress ipMestre = MDNS.queryHost(mestre.deviceID);
-
     if (!ipMestre)
     {
-        logaM(LOG_AVISO, "Mestre não respondeu o mDNS");
+        logaM(LOG_DEBUG, "Mestre não respondeu o mDNS");
         if (mestre.ip)
         {
             // TODO : ping?
@@ -50,31 +57,13 @@ void mestreCheckOnline()
         return;
     }
 
-    if (!mestre.online)
-        logaM(LOG_AVISO, "Mestre Online!");
-    mestre.online = true;
-
     if (mestre.ip != ipMestre)
     {
         char ipStr[16];
         utilIPToString(ipMestre, ipStr, 16);
         logaM(LOG_AVISO, "Mestre novo IP [%s]", ipStr);
-    }
-    mestre.ip = ipMestre;
 
-    mestre.ultimoHeartbeat = millis();
-}
-
-void mestreLoop()
-{
-    if (!mestreAtivo()) // Sem mestre retorna
-        return;
-
-    if (millis() - mestre.ultimoHeartbeat > MESTRE_HEARTBEAT_TIMEOUT)
-    {
-        if (mestre.online)
-            logaM(LOG_AVISO, "Mestre - OFFLINE!");
-        mestre.online = false;
+        mestre.ip = ipMestre;
     }
 }
 
@@ -89,10 +78,14 @@ void mestreEnviaEvento(TipoEvento tipoEvento, const char *id, const char *device
         return;
     }
 
-    if (!mestre.online)
+    if (!mestre.ip)
     {
-        logaM(LOG_AVISO, "Mestre OFFLINE. Descartando evento [%d]", tipoEvento);
-        return;
+        mestreCheckIP();
+        if (!mestre.ip)
+        {
+            logaM(LOG_AVISO, "Mestre OFFLINE. Descartando evento [%d]", tipoEvento);
+            return;
+        }
     }
 
     time_t now = 0;
@@ -118,14 +111,4 @@ void mestreEnviaEvento(TipoEvento tipoEvento, const char *id, const char *device
     body += F("}}");
 
     apiInternaEnviaEvento(mestre.ip, body.c_str());
-}
-
-bool mestreAtivo()
-{
-    return (mestre.deviceID != "");
-}
-
-IPAddress mestreGetIP()
-{
-    return mestre.ip;
 }

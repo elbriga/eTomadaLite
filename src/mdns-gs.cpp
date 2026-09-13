@@ -10,6 +10,9 @@ void mdnsInit()
 {
     String hostname = eTomadaLiteDeviceID();
 
+    // Pode ser um re-init devido a mudança de hostname
+    MDNS.end();
+
     if (!MDNS.begin(hostname.c_str()))
     {
         logaM(LOG_CRITICO, "Erro ao iniciar mDNS [%s]", hostname.c_str());

@@ -6,15 +6,9 @@ struct Mestre
 {
     String deviceID;
     IPAddress ip;
-    bool online;
-    uint32_t ultimoHeartbeat;
 };
 
 void mestreInit();
-void mestreCheckOnline();
-
-void mestreLoop();
-bool mestreAtivo();
-IPAddress mestreGetIP();
+void mestreCheckIP();
 
 void mestreEnviaEvento(TipoEvento tipoEvento, const char *id, const char *deviceJson);

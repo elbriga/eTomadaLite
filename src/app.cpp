@@ -78,9 +78,6 @@ void appLoop()
   {
     ultimoSegundo = timeinfo.tm_sec;
 
-    if (!modoAP)
-      mestreLoop();
-
     sensorDigitalProcessa();
 
     // 10s/10s
@@ -89,7 +86,7 @@ void appLoop()
       ultimo10s = timeinfo.tm_sec / 10;
 
       if (!modoAP)
-        mestreCheckOnline();
+        mestreCheckIP();
     }
 
     // 1h/1h
