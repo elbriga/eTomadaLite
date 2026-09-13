@@ -154,6 +154,10 @@ int apiInterna(const char *host, const char *endpoint, const char *request, char
         strlcpy(responseOut, response, API_INTERNA_RESPONSE_MAXLEN);
     }
   }
+  else
+  {
+    logaM(LOG_AVISO, " >> RESP nOK: %d", code);
+  }
 
   http.end();
 

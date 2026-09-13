@@ -91,6 +91,7 @@ void mestreEnviaEvento(TipoEvento tipoEvento, const char *id, const char *device
     time_t now = 0;
     time(&now);
 
+    // TODO :: usar *GetRecursoJSON()
     String body;
     body.reserve(256);
 
@@ -106,7 +107,7 @@ void mestreEnviaEvento(TipoEvento tipoEvento, const char *id, const char *device
     body += F(",\"evento\":\"");
     body += eventoGetTipoTxt(tipoEvento);
 
-    body += F("\",\"device\":{");
+    body += F("\",\"device\":{"); // TODO :: mudar device para recurso
     body += deviceJson;
     body += F("}}");
 

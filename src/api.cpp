@@ -7,6 +7,7 @@
 #include "wifi.h"
 #include "mestre.h"
 #include "sensor.h"
+#include "mdns-gs.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..API..", nivel, fmt, ##__VA_ARGS__)
@@ -51,13 +52,9 @@ void apiGetSnapshot()
 
   resposta += F(",\"recursos\":[");
 
-  resposta += F("{\"id\":\"R1\",\"device\":{\"estado\":");
-  resposta += releGetEstado() ? "1" : "0";
-  resposta += F("}},");
-
-  resposta += F("{\"id\":\"S1\",\"device\":{\"valor\":");
-  resposta += sensorDigitalGetEstado() ? "1" : "0";
-  resposta += F("}}");
+  resposta += releGetRecursoJSON();
+  resposta += F(",");
+  resposta += sensorGetRecursoJSON();
 
   resposta += F("]}");
 
@@ -79,6 +76,8 @@ void apiConfig()
 
     delay(100);
     wifiConnect();
+    if (!wifiGetModoAP())
+      mdnsInit();
   }
   else if (server.hasArg("ssid") && server.hasArg("senha"))
   {

@@ -32,6 +32,16 @@ bool releGetEstado()
   return releLigado;
 }
 
+String releGetRecursoJSON()
+{
+  String resposta;
+  resposta.reserve(50);
+  resposta = F("{\"id\":\"R1\",\"tipo\":\"RELE\",\"device\":{\"estado\":");
+  resposta += releLigado ? "1" : "0";
+  resposta += F("}}");
+  return resposta;
+}
+
 void apiRele(bool estado)
 {
   logaM(LOG_NORMAL, "API set rele: %s", (estado ? "ON" : "OFF"));
@@ -40,8 +50,8 @@ void apiRele(bool estado)
 
   String resposta;
   resposta.reserve(64);
-  resposta = F("{\"ok\":true,\"rele\":");
-  resposta += releLigado ? "1" : "0";
+  resposta = F("{\"msg\":\"OK\",\"recurso\":");
+  resposta += releGetRecursoJSON();
   resposta += "}";
 
   server.send(200, "application/json", resposta);

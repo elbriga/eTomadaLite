@@ -43,6 +43,16 @@ bool sensorDigitalGetEstado()
     return sensorDigital.estado;
 }
 
+String sensorGetRecursoJSON()
+{
+    String resposta;
+    resposta.reserve(52);
+    resposta = F("{\"id\":\"S1\",\"tipo\":\"SENSOR\",\"device\":{\"valor\":");
+    resposta += sensorDigitalGetEstado() ? "1" : "0";
+    resposta += F("}}");
+    return resposta;
+}
+
 // Chamado a cada segundo
 void sensorDigitalProcessa()
 {
@@ -67,10 +77,18 @@ void sensorDigitalProcessa()
 
             sensorDigital.estado = leitura;
 
-            String device = F("\"valor\":");
-            device += sensorDigital.estado ? "1" : "0";
-
-            mestreEnviaEvento(EVENTO_VALOR_MUDOU, "S1", device.c_str());
+            sensorDigitalEnviaEvento();
         }
     }
+}
+
+void sensorDigitalEnviaEvento()
+{
+    if (!sensorDigitalAtivo())
+        return;
+
+    String device = F("\"valor\":");
+    device += sensorDigital.estado ? "1" : "0";
+
+    mestreEnviaEvento(EVENTO_VALOR_MUDOU, "S1", device.c_str());
 }
