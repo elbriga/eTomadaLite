@@ -26,7 +26,7 @@ void sensorDigitalInit()
     logaM(LOG_NORMAL, "Inicializando sensor Digital em [%d]",
           hardwareProfile.sensorDigital.pin);
 
-    pinMode(hardwareProfile.sensorDigital.pin, INPUT);
+    pinMode(hardwareProfile.sensorDigital.pin, INPUT_PULLUP);
 
     sensorDigital.estado = digitalRead(hardwareProfile.sensorDigital.pin);
     sensorDigital.ultimoEstado = sensorDigital.estado;
@@ -47,7 +47,7 @@ String sensorGetRecursoJSON()
 {
     String resposta;
     resposta.reserve(52);
-    resposta = F("{\"id\":\"S1\",\"tipo\":\"SENSOR\",\"device\":{\"valor\":");
+    resposta = F("{\"id\":\"S1\",\"tipo\":\"SENSOR\",\"device\":{\"status\":\"OK\",\"valor\":");
     resposta += sensorDigitalGetEstado() ? "1" : "0";
     resposta += F("}}");
     return resposta;

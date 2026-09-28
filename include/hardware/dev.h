@@ -10,7 +10,7 @@ const HardwareProfile hardwareProfile = {
     .releInvertido = false,
     .botaoPin = 5,
     .sensorDigital = {
-        .pin = 255,
-        .debounceMS = 0,
+        .pin = 14,
+        .debounceMS = 2000,
     },
 };
