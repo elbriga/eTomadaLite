@@ -28,6 +28,8 @@ typedef struct
 #include "hardware/miniD1.h"
 #elif defined(HW_COZY)
 #include "hardware/cozy.h"
+#elif defined(HW_ESP01)
+#include "hardware/esp01.h"
 #else
 #error "Nenhum Hardware Profile definido."
 #endif
