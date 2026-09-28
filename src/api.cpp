@@ -8,6 +8,8 @@
 #include "mestre.h"
 #include "sensor.h"
 #include "mdns-gs.h"
+#include "http.h"
+#include "botao.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..API..", nivel, fmt, ##__VA_ARGS__)
@@ -21,7 +23,7 @@ void apiGetSnapshot()
 
   resposta.reserve(256);
 
-  resposta = F("{\"device\":\"eTomada\",");
+  resposta = F("{\"device\":\"eTomada\",\"api\":\"Lite\",");
 
   resposta += F("\"fw_version\":\"");
   resposta += eTomadaLiteVersion();
@@ -51,14 +53,16 @@ void apiGetSnapshot()
   resposta += String(WiFi.RSSI());
 
   resposta += F(",\"recursos\":[");
-
   resposta += releGetRecursoJSON();
   resposta += F(",");
   resposta += sensorGetRecursoJSON();
+  resposta += F(",");
+  resposta += botaoGetRecursoJSON();
 
   resposta += F("]}");
 
   server.send(200, "application/json", resposta);
+  httpLogaRequest("OK");
 }
 
 void apiConfig()
@@ -72,6 +76,8 @@ void apiConfig()
     configSave();
 
     server.send(200, "application/json", R"({"ok":true,"msg":"hostname configurado"})");
+    httpLogaRequest("hostname configurado");
+
     logaM(LOG_NORMAL, "Hostname configurado. Reconectar");
 
     delay(100);
@@ -90,6 +96,8 @@ void apiConfig()
     configSave();
 
     server.send(200, "application/json", R"({"ok":true,"msg":"wifi configurado > reconectar"})");
+    httpLogaRequest("WiFi configurado");
+
     logaM(LOG_NORMAL, "WiFi configurado. Reconectar");
 
     delay(100);
@@ -104,6 +112,8 @@ void apiConfig()
       configSave();
     }
     server.send(200, "application/json", R"({"ok":true,"msg":"logLevel configurado"})");
+    httpLogaRequest("Log Level configurado");
+
     logaM(LOG_NORMAL, "Log Level setado para [%s]", logaGetNivelTxt((LogLevel)config.logLevel));
   }
   else if (server.hasArg("mestre"))
@@ -115,6 +125,8 @@ void apiConfig()
     configSave();
 
     server.send(200, "application/json", R"({"ok":true,"msg":"mestre configurado"})");
+    httpLogaRequest("Mestre configurado");
+
     logaM(LOG_NORMAL, "Mestre configurado. Reinit mestre");
 
     mestreInit();
@@ -122,6 +134,7 @@ void apiConfig()
   else
   {
     server.send(400, "application/json", R"({"ok":false,"msg":"missing args"})");
+    httpLogaRequest("MISSING ARGS");
     return;
   }
 }
@@ -129,5 +142,6 @@ void apiConfig()
 void apiReset()
 {
   server.send(200, "application/json", R"({"ok":true,"msg":"vou reiniciar"})");
+  httpLogaRequest("API Reset");
   utilRestart("API reset");
 }

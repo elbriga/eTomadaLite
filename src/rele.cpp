@@ -13,6 +13,7 @@ bool releLigado = false;
 
 void releInit()
 {
+  logaM(LOG_NORMAL, "Ativando rele em [%d]", hardwareProfile.relePin);
   pinMode(hardwareProfile.relePin, OUTPUT);
   releSet(false);
 }

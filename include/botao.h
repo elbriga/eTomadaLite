@@ -17,6 +17,8 @@ struct Botao
 void botoesInit();
 bool botaoAtivo();
 
+String botaoGetRecursoJSON();
+
 void botaoPrint();
 
 // JsonDocument botaoGetJSONDoc(Botao *s, bool full);

@@ -24,6 +24,8 @@ void botoesInit()
   if (!botaoAtivo())
     return;
 
+  logaM(LOG_NORMAL, "Ativando botão em [%d]", hardwareProfile.botaoPin);
+
   botao.pino = hardwareProfile.botaoPin;
 
   pinMode(botao.pino, INPUT_PULLUP);
@@ -39,6 +41,16 @@ void botoesInit()
 bool botaoAtivo()
 {
   return hardwareProfile.botaoPin != 255;
+}
+
+String botaoGetRecursoJSON()
+{
+  String resposta;
+  resposta.reserve(50);
+  resposta = F("{\"id\":\"B1\",\"tipo\":\"BOTAO\",\"device\":{\"estado\":");
+  resposta += botao.estado ? "1" : "0";
+  resposta += F("}}");
+  return resposta;
 }
 
 void botaoPrint()
