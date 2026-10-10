@@ -35,6 +35,12 @@ void apiGetSnapshot()
   resposta += F("\",\"device_board\":\"");
   resposta += eTomadaLiteDeviceBoard();
 
+  if (mestreAtivo())
+  {
+    resposta += F("\",\"mestre\":\"");
+    resposta += mestreGetID();
+  }
+
   resposta += F("\",\"uptime\":");
   resposta += millis();
 
