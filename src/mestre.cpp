@@ -12,15 +12,27 @@
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("MESTRE.", nivel, fmt, ##__VA_ARGS__)
 
+struct Mestre
+{
+    String deviceID;
+    IPAddress ip;
+    uint32_t getIPms;
+};
 Mestre mestre = {};
 
-#define MESTRE_HEARTBEAT_TIMEOUT 30000
+// Tempo máximo para considerar o IP do mestre válido (5 minutos)
+#define MESTRE_IP_TIMEOUT 300000
 
 extern Config config;
 
 bool mestreAtivo()
 {
     return (mestre.deviceID != "");
+}
+
+const char *mestreGetID()
+{
+    return mestre.deviceID.c_str();
 }
 
 void mestreInit()
@@ -43,6 +55,12 @@ void mestreCheckIP()
     if (!mestreAtivo())
         return;
 
+    if (mestre.ip && (millis() - mestre.getIPms) < MESTRE_IP_TIMEOUT)
+    {
+        // Mestre ativo, não precisa checar o IP
+        return;
+    }
+
     // Procurar nosso mestre
     // Suporte para queryHost e queryService adicionado na minha versão do LibreTiny
     // Suporte para queryHost adicionado na minha versão do framework-arduinoespressif8266
@@ -64,6 +82,7 @@ void mestreCheckIP()
         logaM(LOG_AVISO, "Mestre novo IP [%s]", ipStr);
 
         mestre.ip = ipMestre;
+        mestre.getIPms = millis();
     }
 }
 

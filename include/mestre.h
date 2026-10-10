@@ -2,13 +2,10 @@
 #include "platform.h"
 #include "eventos.h"
 
-struct Mestre
-{
-    String deviceID;
-    IPAddress ip;
-};
-
 void mestreInit();
+bool mestreAtivo();
+
+const char *mestreGetID();
 void mestreCheckIP();
 
 void mestreEnviaEvento(TipoEvento tipoEvento, const char *id, const char *deviceJson);
