@@ -117,7 +117,10 @@ void appLoop()
     tecladoEkazaLoop();
     TecladoEkazaEvento evento;
     while (tecladoEkazaProximoEvento(evento))
-      Serial.printf("EKAZA: tecla %u, evento %u\n", evento.tecla, evento.tipo);
+    {
+      logaM(LOG_NORMAL, "EKAZA: tecla %u, evento %u", evento.tecla, evento.tipo);
+      releToggle(evento.tecla - 1);
+    }
   }
 
   delay(5);

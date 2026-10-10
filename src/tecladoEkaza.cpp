@@ -120,16 +120,13 @@ void tecladoEkazaInit()
 
 void tecladoEkazaLoop()
 {
+    uint32_t agora;
+
     while (Serial1.available() > 0)
     {
-        uint32_t agora = millis();
-
-        if (framePos &&
-            (uint32_t)(agora - ultimoByteMs) > TIMEOUT_FRAME_MS)
-        {
+        agora = millis();
+        if (framePos && (uint32_t)(agora - ultimoByteMs) > TIMEOUT_FRAME_MS)
             framePos = 0;
-        }
-
         ultimoByteMs = agora;
 
         int b = Serial1.read();
