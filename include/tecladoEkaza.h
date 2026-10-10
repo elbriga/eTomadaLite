@@ -5,8 +5,9 @@
 
 enum TecladoEkazaEventoTipo : uint8_t
 {
-    TECLADO_EKAZA_TOQUE,
-    TECLADO_EKAZA_LONG_PRESS
+    TECLADO_EKAZA_TOQUE = 0,
+    TECLADO_EKAZA_LONG_PRESS = 1,
+    TECLADO_EKAZA_KEEP_PRESS = 2,
 };
 
 struct TecladoEkazaEvento

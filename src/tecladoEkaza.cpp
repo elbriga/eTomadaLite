@@ -1,7 +1,10 @@
+#include <cstring>
 
+#include "loga.h"
 #include "tecladoEkaza.h"
 
-#include <cstring>
+// Função de log para esta modulo
+#define logaM(nivel, fmt, ...) loga(".EKAZA.", nivel, fmt, ##__VA_ARGS__)
 
 namespace
 {
@@ -36,8 +39,10 @@ namespace
         if (frame[2] != 0x00 ||
             frame[3] != 0x08 ||
             frame[4] != 0x00 ||
-            frame[5] != 0x10 ||
-            frame[6] != 0x00)
+            frame[5] != 0x10)
+            return false;
+
+        if (frame[6] > TECLADO_EKAZA_KEEP_PRESS)
             return false;
 
         if (frame[7] < 1 || frame[7] > 6)
@@ -94,15 +99,15 @@ namespace
         if (framePos < FRAME_SIZE)
             return;
 
-        if (validaFrame())
+        if (!validaFrame())
         {
-            adicionaEvento(frame[7], TECLADO_EKAZA_TOQUE);
-            framePos = 0;
-        }
-        else
-        {
+            logaM(LOG_CRITICO, "EKAZA: frame inválido recebido");
             ressincroniza();
+            return;
         }
+
+        adicionaEvento(frame[7], (TecladoEkazaEventoTipo)frame[6]);
+        framePos = 0;
     }
 }
 

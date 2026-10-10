@@ -119,7 +119,13 @@ void appLoop()
     while (tecladoEkazaProximoEvento(evento))
     {
       logaM(LOG_NORMAL, "EKAZA: tecla %u, evento %u", evento.tecla, evento.tipo);
-      releToggle(evento.tecla - 1);
+
+      if (evento.tipo == TECLADO_EKAZA_TOQUE)
+        releToggle(evento.tecla - 1);
+      else if (evento.tipo == TECLADO_EKAZA_LONG_PRESS)
+      {
+        logaM(LOG_NORMAL, "EKAZA: tecla %u, LONG_PRESS", evento.tecla);
+      }
     }
   }
 
