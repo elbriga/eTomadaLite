@@ -12,6 +12,7 @@
 #include "botao.h"
 #include "ntp.h"
 #include "sensor.h"
+#include "tecladoEkaza.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..APP..", nivel, fmt, ##__VA_ARGS__)
@@ -48,6 +49,9 @@ void appInit()
   releInit();
   botoesInit();
   sensorDigitalInit();
+
+  // TODO :: IF tem tecladoEkaza
+  tecladoEkazaInit();
 
   wifiConnect();
   modoAP = wifiGetModoAP();
@@ -106,6 +110,14 @@ void appLoop()
   {
     logaProcessa();
     mdnsProcessa();
+  }
+
+  // TODO :: IF tem tecladoEkaza
+  {
+    tecladoEkazaLoop();
+    TecladoEkazaEvento evento;
+    while (tecladoEkazaProximoEvento(evento))
+      Serial.printf("EKAZA: tecla %u, evento %u\n", evento.tecla, evento.tipo);
   }
 
   delay(5);
