@@ -9,50 +9,92 @@
 extern ETomadaWebServer server;
 extern const HardwareProfile hardwareProfile;
 
-bool releLigado = false;
+int totReles = 0;
+bool releLigado[MAX_RELES];
+
+int relesGetCount()
+{
+  return totReles;
+}
 
 void releInit()
 {
-  logaM(LOG_NORMAL, "Ativando rele em [%d]", hardwareProfile.relePin);
-  pinMode(hardwareProfile.relePin, OUTPUT);
-  releSet(false);
+  for (int i = 0; i < MAX_RELES; i++)
+  {
+    if (hardwareProfile.relePin[i] == 255)
+      break;
+
+    totReles++;
+    pinMode(hardwareProfile.relePin[i], OUTPUT);
+
+    logaM(LOG_NORMAL, "Ativando rele [%d] no pino [%d]", i + 1, hardwareProfile.relePin[i]);
+    releSet(i, false);
+  }
 }
 
-void releSet(bool ligado)
+void releSet(int index, bool ligado)
 {
-  releLigado = ligado;
+  if (index < 0 || index >= totReles)
+  {
+    logaM(LOG_AVISO, "releSet() > Rele invalido: %d", index);
+    return;
+  }
 
-  digitalWrite(hardwareProfile.relePin,
+  releLigado[index] = ligado;
+
+  digitalWrite(hardwareProfile.relePin[index],
                hardwareProfile.releInvertido ? !ligado : ligado);
 
-  logaM(LOG_DEBUG0, "Rele: %s", ligado ? "ON" : "OFF");
+  logaM(LOG_DEBUG0, "Rele [%d]: %s", index + 1, ligado ? "ON" : "OFF");
 }
 
-bool releGetEstado()
+void releToggle(int index)
 {
-  return releLigado;
+  releSet(index, !releLigado[index]);
 }
 
-String releGetRecursoJSON()
+bool releGetEstado(int index)
+{
+  if (index < 0 || index >= totReles)
+  {
+    logaM(LOG_AVISO, "releGetEstado() > Rele invalido: %d", index);
+    return false;
+  }
+
+  return releLigado[index];
+}
+
+String releGetRecursoJSON(int index)
 {
   String resposta;
   resposta.reserve(50);
-  resposta = F("{\"id\":\"R1\",\"tipo\":\"RELE\",\"device\":{\"estado\":");
-  resposta += releLigado ? "1" : "0";
+
+  if (index < 0 || index >= totReles)
+  {
+    logaM(LOG_AVISO, "releGetRecursoJSON() > Rele invalido: %d", index);
+    resposta = F("{}");
+    return resposta;
+  }
+
+  resposta = F("{\"id\":\"R");
+  resposta += String(index + 1);
+  resposta += F("\",\"tipo\":\"RELE\",\"device\":{\"estado\":");
+  resposta += releLigado[index] ? "1" : "0";
   resposta += F("}}");
+
   return resposta;
 }
 
-void apiRele(bool estado)
+void apiRele(int index, bool estado)
 {
   logaM(LOG_NORMAL, "API set rele: %s", (estado ? "ON" : "OFF"));
 
-  releSet(estado);
+  releSet(index, estado);
 
   String resposta;
   resposta.reserve(64);
   resposta = F("{\"msg\":\"OK\",\"recurso\":");
-  resposta += releGetRecursoJSON();
+  resposta += releGetRecursoJSON(index);
   resposta += "}";
 
   server.send(200, "application/json", resposta);
@@ -60,6 +102,13 @@ void apiRele(bool estado)
 
 void apiReleSet()
 {
+  int index = server.hasArg("id") ? server.arg("id").toInt() - 1 : 0;
+  if (index < 0 || index >= totReles)
+  {
+    server.send(400, "application/json", R"({"ok":false,"msg":"invalid id"})");
+    return;
+  }
+
   if (!server.hasArg("estado"))
   {
     server.send(400, "application/json", R"({"ok":false,"msg":"missing estado"})");
@@ -74,10 +123,16 @@ void apiReleSet()
       estado == "ON" ||
       estado == "true";
 
-  apiRele(ligado);
+  apiRele(index, ligado);
 }
 
 void apiReleToggle()
 {
-  apiRele(!releLigado);
+  int index = server.hasArg("id") ? server.arg("id").toInt() - 1 : 0;
+  if (index < 0 || index >= totReles)
+  {
+    server.send(400, "application/json", R"({"ok":false,"msg":"invalid id"})");
+    return;
+  }
+  releToggle(index);
 }

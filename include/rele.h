@@ -1,10 +1,13 @@
 #pragma once
 
 void releInit();
-void releSet(bool ligado);
-bool releGetEstado();
+int relesGetCount();
 
-String releGetRecursoJSON();
+void releSet(int index, bool ligado);
+void releToggle(int index);
+bool releGetEstado(int index);
+
+String releGetRecursoJSON(int index);
 
 void apiReleSet();
 void apiReleToggle();

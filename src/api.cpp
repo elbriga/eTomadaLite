@@ -59,7 +59,13 @@ void apiGetSnapshot()
   resposta += String(WiFi.RSSI());
 
   resposta += F(",\"recursos\":[");
-  resposta += releGetRecursoJSON();
+  int totReles = relesGetCount();
+  for (int i = 0; i < totReles; i++)
+  {
+    if (i > 0)
+      resposta += F(",");
+    resposta += releGetRecursoJSON(i);
+  }
   resposta += F(",");
   resposta += sensorGetRecursoJSON();
   resposta += F(",");

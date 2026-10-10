@@ -538,10 +538,12 @@ void recoveryInit()
     }
 
     // Por seguranca, recovery sempre inicia com rele desligado.
-    if (hardwareProfile.relePin != 255)
+    for (int i = 0; i < MAX_RELES; i++)
     {
-        pinMode(hardwareProfile.relePin, OUTPUT);
-        digitalWrite(hardwareProfile.relePin, LOW);
+        if (hardwareProfile.relePin[i] == 255)
+            break;
+        pinMode(hardwareProfile.relePin[i], OUTPUT);
+        digitalWrite(hardwareProfile.relePin[i], hardwareProfile.releInvertido ? HIGH : LOW);
     }
 
     recoveryWifiInit();

@@ -7,7 +7,7 @@ const HardwareProfile hardwareProfile = {
     .board = "esp01_1m",
     .ledPin = 255,
     .ledInvertido = false,
-    .relePin = 2,
+    .relePin = {2, 255},
     .releInvertido = false,
     .botaoPin = 255,
     .sensorDigital = {.pin = 255},

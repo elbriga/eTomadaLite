@@ -1,13 +1,15 @@
 #pragma once
 #include <Arduino.h>
 
+#define MAX_RELES 8
+
 typedef struct
 {
     const char *modelo; // Modelo do eTomadaLite
     const char *board;  // board do esp
     int ledPin;
     bool ledInvertido;
-    int relePin;
+    int relePin[MAX_RELES];
     bool releInvertido;
     int botaoPin;
     struct
