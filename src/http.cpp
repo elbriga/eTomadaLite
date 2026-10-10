@@ -5,6 +5,7 @@
 #include "wifi.h"
 #include "rele.h"
 #include "recovery.h"
+#include "util.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".HTTP..", nivel, fmt, ##__VA_ARGS__)
@@ -21,6 +22,21 @@ void httpRoot()
   server.send(200, "text/plain", "eTomada Lite");
 }
 
+void http404()
+{
+  char ipStr[16];
+  utilIPToString(server.client().remoteIP(), ipStr, 16);
+
+  const char *methodStr =
+      server.method() == HTTP_GET ? "GET" : server.method() == HTTP_POST ? "POST"
+                                        : server.method() == HTTP_PUT    ? "PUT"
+                                                                         : "OTHER";
+  logaM(LOG_AVISO, "Erro 404 de [%s]: %s %s\n",
+        ipStr, methodStr, server.uri().c_str());
+
+  server.send(404, "text/plain", "Not found");
+}
+
 void httpInit()
 {
   server.on("/api/getSnapshot", HTTP_GET, apiGetSnapshot);
@@ -35,6 +51,8 @@ void httpInit()
   recoveryAPIRegister();
 
   server.on("/", HTTP_GET, httpRoot);
+
+  server.onNotFound(http404);
 
   server.begin();
 
@@ -70,9 +88,9 @@ const char *httpMethodToString()
 
 void httpLogaRequest(String msg)
 {
+  char ipStr[16];
+  utilIPToString(server.client().remoteIP(), ipStr, 16);
+
   logaM(LOG_NORMAL, "[org:%s] %s %s => [%s]",
-        server.client().remoteIP().toString().c_str(),
-        httpMethodToString(),
-        server.uri().c_str(),
-        msg.c_str());
+        ipStr, httpMethodToString(), server.uri().c_str(), msg.c_str());
 }
