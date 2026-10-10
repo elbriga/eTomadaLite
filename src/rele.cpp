@@ -2,6 +2,7 @@
 #include "loga.h"
 #include "rele.h"
 #include "hardwareProfile.h"
+#include "mestre.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".RELE..", nivel, fmt, ##__VA_ARGS__)
@@ -46,6 +47,13 @@ void releSet(int index, bool ligado)
                hardwareProfile.releInvertido ? !ligado : ligado);
 
   logaM(LOG_DEBUG0, "Rele [%d]: %s", index + 1, ligado ? "ON" : "OFF");
+
+  String id = String("R") + String(index + 1);
+
+  String device = F("\"estado\":");
+  device += ligado ? "1" : "0";
+
+  mestreEnviaEvento(EVENTO_TOGGLE, id.c_str(), device.c_str());
 }
 
 void releToggle(int index)
