@@ -13,4 +13,8 @@ const HardwareProfile hardwareProfile = {
         .pin = 255,
         .debounceMS = 0,
     },
+    .backlight = {
+        .pin = PIN_P28,
+        .invertido = true,
+    },
 };

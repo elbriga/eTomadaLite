@@ -13,4 +13,5 @@ const HardwareProfile hardwareProfile = {
         .pin = 255,
         .debounceMS = 0,
     },
+    .backlight = {.pin = 255, .invertido = false},
 };

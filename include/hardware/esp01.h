@@ -11,4 +11,5 @@ const HardwareProfile hardwareProfile = {
     .releInvertido = false,
     .botaoPin = 255,
     .sensorDigital = {.pin = 255},
+    .backlight = {.pin = 255, .invertido = false},
 };

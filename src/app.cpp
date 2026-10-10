@@ -13,6 +13,7 @@
 #include "ntp.h"
 #include "sensor.h"
 #include "tecladoEkaza.h"
+#include "backlight.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..APP..", nivel, fmt, ##__VA_ARGS__)
@@ -46,6 +47,7 @@ void appInit()
 
   // Hardware
   ledInit();
+  backlightInit();
   releInit();
   botoesInit();
   sensorDigitalInit();
@@ -123,9 +125,7 @@ void appLoop()
       if (evento.tipo == TECLADO_EKAZA_TOQUE)
         releToggle(evento.tecla - 1);
       else if (evento.tipo == TECLADO_EKAZA_LONG_PRESS)
-      {
-        logaM(LOG_NORMAL, "EKAZA: tecla %u, LONG_PRESS", evento.tecla);
-      }
+        backlightToggle();
     }
   }
 
