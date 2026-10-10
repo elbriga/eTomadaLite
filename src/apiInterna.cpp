@@ -73,7 +73,7 @@ int apiInterna(const char *host, const char *endpoint, const char *request, char
   WiFiClient client;
   if (!http.begin(client, url))
   {
-    Serial.println("Nao foi possivel iniciar HTTP para api Interna.");
+    logaM(LOG_AVISO, "Nao foi possivel iniciar HTTP para api Interna.");
     return -1;
   }
 
