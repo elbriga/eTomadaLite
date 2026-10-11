@@ -11,6 +11,7 @@ typedef struct
     {
         uint8_t pin;
         bool invertido;
+        bool piscar;
     } led;
     struct
     {

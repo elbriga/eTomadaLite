@@ -35,7 +35,7 @@ bool ledAtivo()
 
 void ledProcessa()
 {
-  if (!ledAtivo())
+  if (!ledAtivo() || !hardwareProfile.led.piscar)
     return;
 
   // Sincronizado com o segundo!

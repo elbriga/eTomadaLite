@@ -4,7 +4,7 @@
 const HardwareProfile hardwareProfile = {
     .modelo = "MINIR1",
     .board = "esp01_1m",
-    .led = {.pin = 13, .invertido = true},
+    .led = {.pin = 13, .invertido = true, .piscar = true},
     .rele = {.pin = {12, 255}, .invertido = false},
     .botao = {.pin = 255},
     .sensorDigital = {.pin = 255},
