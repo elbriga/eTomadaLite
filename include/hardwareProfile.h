@@ -11,7 +11,7 @@ typedef struct
     {
         uint8_t pin;
         bool invertido;
-        bool piscar;
+        bool pisca;
     } led;
     struct
     {
@@ -38,8 +38,8 @@ typedef struct
 
 #ifdef HW_DEV
 #include "hardware/dev.h"
-#elif defined(HW_WEMOS)
-#include "hardware/wemos.h"
+#elif defined(HW_QUARTO)
+#include "hardware/quarto.h"
 #elif defined(HW_SONOFF_MINIR1)
 #include "hardware/miniR1.h"
 #elif defined(HW_SONOFF_MINID1)
