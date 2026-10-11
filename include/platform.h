@@ -30,10 +30,3 @@ using ETomadaWebServer = WebServer;
 #else
 #error "Plataforma nao suportada pelo eTomada Lite"
 #endif
-
-inline void platformMDNSUpdate()
-{
-#if defined(ESP8266)
-    MDNS.update();
-#endif
-}

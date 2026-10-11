@@ -5,7 +5,6 @@
 #include "rele.h"
 #include "wifi.h"
 #include "http.h"
-#include "mdns-gs.h"
 #include "led.h"
 #include "memoria.h"
 #include "mestre.h"
@@ -63,10 +62,10 @@ void appInit()
   if (!modoAP)
   {
     ntpInit();
-    mdnsInit();
     mestreInit();
   }
 
+  ledSet(false);
   logaM(LOG_NORMAL, "Inicializacao concluida.");
 }
 
@@ -99,10 +98,7 @@ void appLoop()
   botaoProcessa();
 
   if (!modoAP)
-  {
     logaProcessa();
-    mdnsProcessa();
-  }
 
   // TODO :: IF tem tecladoEkaza
   {
