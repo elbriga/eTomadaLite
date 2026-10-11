@@ -71,7 +71,6 @@ void appInit()
 }
 
 static time_t ultimoSegundo = -1;
-static time_t ultimo10s = -1;
 static time_t tsTimerHora = 0;
 void appLoop()
 {
@@ -85,15 +84,6 @@ void appLoop()
     ultimoSegundo = timeinfo.tm_sec;
 
     sensorDigitalProcessa();
-
-    // 10s/10s
-    if (ultimo10s != timeinfo.tm_sec / 10)
-    {
-      ultimo10s = timeinfo.tm_sec / 10;
-
-      if (!modoAP)
-        mestreCheckIP();
-    }
 
     // 1h/1h
     if (now - tsTimerHora > 60 * 60)

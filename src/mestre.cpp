@@ -27,7 +27,7 @@ extern Config config;
 
 bool mestreAtivo()
 {
-    return (mestre.deviceID != "");
+    return utilIPValido(mestre.ip);
 }
 
 const char *mestreGetID()
@@ -40,50 +40,33 @@ void mestreInit()
     mestre.deviceID = String(config.mestre);
     mestre.ip = IPAddress();
 
-    if (!mestreAtivo())
-        return;
-
-    logaM(LOG_AVISO, "Nodo Mestre: %s", mestre.deviceID.c_str());
-    mestreCheckIP();
-
-    if (mestre.ip)
-        sensorDigitalEnviaEvento();
-}
-
-void mestreCheckIP()
-{
-    if (!mestreAtivo())
-        return;
-
-    if (mestre.ip && (millis() - mestre.getIPms) < MESTRE_IP_TIMEOUT)
+    if (mestre.deviceID == "")
     {
-        // Mestre ativo, não precisa checar o IP
+        logaM(LOG_AVISO, "Sem MESTRE configurado!");
         return;
     }
 
-    // Procurar nosso mestre
-    // Suporte para queryHost e queryService adicionado na minha versão do LibreTiny
-    // Suporte para queryHost adicionado na minha versão do framework-arduinoespressif8266
-    IPAddress ipMestre = MDNS.queryHost(mestre.deviceID);
-    if (!ipMestre)
+    String hostname = mestre.deviceID + ".etomada";
+    if (!WiFi.hostByName(hostname.c_str(), mestre.ip))
     {
-        logaM(LOG_DEBUG, "Mestre não respondeu o mDNS");
-        if (mestre.ip)
-        {
-            // TODO : ping?
-        }
+        logaM(LOG_CRITICO, "Falha ao resolver o IP do MESTRE");
+        return;
+    }
+    if (!mestre.ip)
+    {
+        logaM(LOG_CRITICO, "Falha ao resolver o IP do MESTRE 2");
         return;
     }
 
-    if (mestre.ip != ipMestre)
-    {
-        char ipStr[16];
-        utilIPToString(ipMestre, ipStr, 16);
-        logaM(LOG_AVISO, "Mestre novo IP [%s]", ipStr);
+    char ipStr[16];
+    utilIPToString(mestre.ip, ipStr, sizeof(ipStr));
+    logaM(LOG_AVISO, "Nodo Mestre: [%s] @ [%s]", mestre.deviceID.c_str(), ipStr);
 
-        mestre.ip = ipMestre;
-        mestre.getIPms = millis();
-    }
+    // Avisar nosso boot para o mestre
+    String json = "\"uptime\":" + String(millis());
+    mestreEnviaEvento(EVENTO_BOOT, "ETOMADA", json.c_str());
+
+    sensorDigitalEnviaEvento();
 }
 
 void mestreEnviaEvento(TipoEvento tipoEvento, const char *id, const char *deviceJson)
@@ -95,16 +78,6 @@ void mestreEnviaEvento(TipoEvento tipoEvento, const char *id, const char *device
     {
         logaM(LOG_AVISO, "offline ou Modo AP. Descartando evento [%d]", tipoEvento);
         return;
-    }
-
-    if (!mestre.ip)
-    {
-        mestreCheckIP();
-        if (!mestre.ip)
-        {
-            logaM(LOG_AVISO, "Mestre OFFLINE. Descartando evento [%d]", tipoEvento);
-            return;
-        }
     }
 
     time_t now = 0;

@@ -3,3 +3,4 @@
 
 void utilRestart(const char *porque);
 void utilIPToString(IPAddress ip, char *out, size_t maxlen);
+bool utilIPValido(IPAddress ip);

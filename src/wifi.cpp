@@ -72,10 +72,5 @@ void wifiConnect()
 
 bool wifiTemIP()
 {
-  IPAddress ip = WiFi.localIP();
-
-  return ip[0] != 0 ||
-         ip[1] != 0 ||
-         ip[2] != 0 ||
-         ip[3] != 0;
+  return utilIPValido(WiFi.localIP());
 }

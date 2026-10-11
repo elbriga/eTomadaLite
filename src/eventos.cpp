@@ -4,6 +4,8 @@ const char *eventoGetTipoTxt(TipoEvento tipo)
 {
     switch (tipo)
     {
+    case EVENTO_BOOT:
+        return "BOOT";
     case EVENTO_NENHUM:
         return "NENHUM";
     case EVENTO_LIGOU:

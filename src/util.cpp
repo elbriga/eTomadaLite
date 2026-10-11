@@ -23,3 +23,8 @@ void utilIPToString(IPAddress ip, char *out, size_t maxlen)
   snprintf(out, maxlen, "%u.%u.%u.%u",
            ip[0], ip[1], ip[2], ip[3]);
 }
+
+bool utilIPValido(IPAddress ip)
+{
+  return ip[0] != 0 || ip[1] != 0 || ip[2] != 0 || ip[3] != 0;
+}
