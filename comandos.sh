@@ -37,7 +37,8 @@ source .venv/bin/activate
 pip install --upgrade pip
 pip install bk7231tools
 
-
+# restaurar firmware original
+bk7231tools write_flash -d /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A5069RR4-if00-port0 -s 0 -S 0 -l 0x200000 --bootloader ekaza-original.bin
 
 # Ouvir a porta serial
 stty -F /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A5069RR4-if00-port0 115200 raw -echo -echoe -echok
