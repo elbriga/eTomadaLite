@@ -24,9 +24,9 @@ void botoesInit()
   if (!botaoAtivo())
     return;
 
-  logaM(LOG_NORMAL, "Ativando botão em [%d]", hardwareProfile.botaoPin);
+  logaM(LOG_NORMAL, "Ativando botão em [%d]", hardwareProfile.botao.pin);
 
-  botao.pino = hardwareProfile.botaoPin;
+  botao.pino = hardwareProfile.botao.pin;
 
   pinMode(botao.pino, INPUT_PULLUP);
 
@@ -40,7 +40,7 @@ void botoesInit()
 
 bool botaoAtivo()
 {
-  return hardwareProfile.botaoPin != 255;
+  return hardwareProfile.botao.pin != 255;
 }
 
 String botaoGetRecursoJSON()

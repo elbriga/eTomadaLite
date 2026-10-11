@@ -5,14 +5,9 @@
 const HardwareProfile hardwareProfile = {
     .modelo = "R1S1",
     .board = "d1_mini",
-    .ledPin = 13,
-    .ledInvertido = false,
-    .relePin = {D2, 255}, // 4
-    .releInvertido = true,
-    .botaoPin = 255,
-    .sensorDigital = {
-        .pin = D5, // 14
-        .debounceMS = 5000,
-    },
-    .backlight = {.pin = 255, .invertido = false},
+    .led = {.pin = 13, .invertido = false},
+    .rele = {.pin = {D2, 255}, .invertido = true},
+    .botao = {.pin = 255},
+    .sensorDigital = {.pin = D5, .debounceMS = 5000},
+    .backlight = {.pin = 255},
 };

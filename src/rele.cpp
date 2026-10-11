@@ -22,13 +22,13 @@ void releInit()
 {
   for (int i = 0; i < MAX_RELES; i++)
   {
-    if (hardwareProfile.relePin[i] == 255)
+    if (hardwareProfile.rele.pin[i] == 255)
       break;
 
     totReles++;
-    pinMode(hardwareProfile.relePin[i], OUTPUT);
+    pinMode(hardwareProfile.rele.pin[i], OUTPUT);
 
-    logaM(LOG_NORMAL, "Ativando rele [%d] no pino [%d]", i + 1, hardwareProfile.relePin[i]);
+    logaM(LOG_NORMAL, "Ativando rele [%d] no pino [%d]", i + 1, hardwareProfile.rele.pin[i]);
     releSet(i, false);
   }
 }
@@ -43,8 +43,8 @@ void releSet(int index, bool ligado)
 
   releLigado[index] = ligado;
 
-  digitalWrite(hardwareProfile.relePin[index],
-               hardwareProfile.releInvertido ? !ligado : ligado);
+  digitalWrite(hardwareProfile.rele.pin[index],
+               hardwareProfile.rele.invertido ? !ligado : ligado);
 
   logaM(LOG_DEBUG0, "Rele [%d]: %s", index + 1, ligado ? "ON" : "OFF");
 

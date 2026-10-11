@@ -7,11 +7,21 @@ typedef struct
 {
     const char *modelo; // Modelo do eTomadaLite
     const char *board;  // board do esp
-    uint8_t ledPin;
-    bool ledInvertido;
-    uint8_t relePin[MAX_RELES];
-    bool releInvertido;
-    uint8_t botaoPin;
+    struct
+    {
+        uint8_t pin;
+        bool invertido;
+    } led;
+    struct
+    {
+        uint8_t pin[MAX_RELES];
+        bool invertido;
+    } rele;
+    struct
+    {
+        uint8_t pin;
+        bool invertido;
+    } botao;
     struct
     {
         uint8_t pin;

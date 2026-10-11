@@ -353,7 +353,7 @@ void recoveryBootTick()
 
 static void recoveryLedLoop()
 {
-    if (hardwareProfile.ledPin == 255)
+    if (hardwareProfile.led.pin == 255)
         return;
 
     // Pisca rapido em recovery: 100 ms
@@ -365,8 +365,8 @@ static void recoveryLedLoop()
     ledUltimoEstado = estado;
 
     digitalWrite(
-        hardwareProfile.ledPin,
-        hardwareProfile.ledInvertido ? !estado : estado);
+        hardwareProfile.led.pin,
+        hardwareProfile.led.invertido ? !estado : estado);
 }
 
 // ============================================================
@@ -530,20 +530,20 @@ void recoveryInit()
     // conectar no WiFi configurado.
     configLoad();
 
-    if (hardwareProfile.ledPin != 255)
+    if (hardwareProfile.led.pin != 255)
     {
-        pinMode(hardwareProfile.ledPin, OUTPUT);
+        pinMode(hardwareProfile.led.pin, OUTPUT);
         // LED Aceso até conectar no Wifi
-        digitalWrite(hardwareProfile.ledPin, !hardwareProfile.ledInvertido);
+        digitalWrite(hardwareProfile.led.pin, !hardwareProfile.led.invertido);
     }
 
     // Por seguranca, recovery sempre inicia com rele desligado.
     for (int i = 0; i < MAX_RELES; i++)
     {
-        if (hardwareProfile.relePin[i] == 255)
+        if (hardwareProfile.rele.pin[i] == 255)
             break;
-        pinMode(hardwareProfile.relePin[i], OUTPUT);
-        digitalWrite(hardwareProfile.relePin[i], hardwareProfile.releInvertido ? HIGH : LOW);
+        pinMode(hardwareProfile.rele.pin[i], OUTPUT);
+        digitalWrite(hardwareProfile.rele.pin[i], hardwareProfile.rele.invertido ? HIGH : LOW);
     }
 
     recoveryWifiInit();
