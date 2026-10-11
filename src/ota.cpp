@@ -8,6 +8,7 @@
 
 extern ETomadaWebServer server;
 
+static bool otaConcluido = false;
 static const char *otaErroMsg = nullptr;
 static size_t otaTamanhoEsperado = 0;
 static int otaTamanhoAtual = 0;
@@ -32,6 +33,7 @@ void apiOtaFlash()
   {
   case UPLOAD_FILE_START:
   {
+    otaConcluido = false;
     otaErroMsg = nullptr;
     otaTamanhoEsperado = 0;
     otaTamanhoAtual = 0;
@@ -171,6 +173,7 @@ void apiOtaFlash()
       return;
     }
 
+    otaConcluido = true;
     logaM(LOG_AVISO, "OTA concluido!");
 
     break;
@@ -190,17 +193,28 @@ void apiOtaFlash()
 
 void apiOtaFlashHelper()
 {
-  if (otaErroMsg != nullptr)
+  if (otaErroMsg != nullptr || !otaConcluido)
   {
+    if (Update.isRunning())
+      otaAbort();
+
+    const char *erro = otaErroMsg
+                           ? otaErroMsg
+                           : "arquivo ausente ou upload incompleto";
     String resposta = "{\"ok\":false,\"msg\":\"";
-    resposta += otaErroMsg;
+    resposta += erro;
     resposta += "\"}";
 
     server.send(400, "application/json", resposta);
+
+    otaErroMsg = nullptr;
+    otaConcluido = false;
     return;
   }
 
   server.send(200, "application/json", R"({"ok":true,"msg":"ota ok > restart"})");
 
-  utilRestart("OTA");
+  // utilRestart("OTA");
+  delay(100);
+  ESP.reset();
 }
