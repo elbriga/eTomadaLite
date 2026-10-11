@@ -51,8 +51,9 @@ void appInit()
   botoesInit();
   sensorDigitalInit();
 
-  // TODO :: IF tem tecladoEkaza
+#ifdef HW_EKAZA_6TECLAS
   tecladoEkazaInit();
+#endif
 
   wifiConnect();
   modoAP = wifiGetModoAP();
@@ -93,27 +94,16 @@ void appLoop()
   }
 
   // 5ms/5ms
-  httpProcessa();
   ledProcessa();
   botaoProcessa();
 
+#ifdef HW_EKAZA_6TECLAS
+  tecladoEkazaProcessa();
+#endif
+
+  httpProcessa();
   if (!modoAP)
     logaProcessa();
-
-  // TODO :: IF tem tecladoEkaza
-  {
-    tecladoEkazaLoop();
-    TecladoEkazaEvento evento;
-    while (tecladoEkazaProximoEvento(evento))
-    {
-      logaM(LOG_NORMAL, "EKAZA: tecla %u, evento %u", evento.tecla, evento.tipo);
-
-      if (evento.tipo == TECLADO_EKAZA_TOQUE)
-        releToggle(evento.tecla - 1);
-      else if (evento.tipo == TECLADO_EKAZA_LONG_PRESS)
-        backlightToggle();
-    }
-  }
 
   delay(5);
 }

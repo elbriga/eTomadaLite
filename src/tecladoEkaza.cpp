@@ -1,10 +1,26 @@
+#include <Arduino.h>
 #include <cstring>
 
 #include "loga.h"
 #include "tecladoEkaza.h"
+#include "rele.h"
+#include "backlight.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".EKAZA.", nivel, fmt, ##__VA_ARGS__)
+
+enum TecladoEkazaEventoTipo : uint8_t
+{
+    TECLADO_EKAZA_TOQUE = 0,
+    TECLADO_EKAZA_LONG_PRESS = 1,
+    TECLADO_EKAZA_KEEP_PRESS = 2,
+};
+
+struct TecladoEkazaEvento
+{
+    uint8_t tecla; // 1..6
+    TecladoEkazaEventoTipo tipo;
+};
 
 namespace
 {
@@ -151,4 +167,21 @@ bool tecladoEkazaProximoEvento(TecladoEkazaEvento &evento)
     filaCount--;
 
     return true;
+}
+
+// chamado no loop principal de 5ms/5ms
+void tecladoEkazaProcessa()
+{
+    tecladoEkazaLoop();
+
+    TecladoEkazaEvento evento;
+    while (tecladoEkazaProximoEvento(evento))
+    {
+        logaM(LOG_NORMAL, "EKAZA: tecla %u, evento %u", evento.tecla, evento.tipo);
+
+        if (evento.tipo == TECLADO_EKAZA_TOQUE)
+            releToggle(evento.tecla - 1);
+        else if (evento.tipo == TECLADO_EKAZA_LONG_PRESS)
+            backlightToggle();
+    }
 }
