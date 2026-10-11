@@ -12,16 +12,16 @@ uso() {
 [[ -z "$FW" || -z "$HOST" ]] && uso
 [[ ! -f "$FW" ]] && uso
 
-TAM=$(stat -c%s $FW)
-SHA=$(sha256sum $FW | awk '{print $1}')
+TAM=$(stat -c%s "$FW")
+SHA=$(sha256sum "$FW" | awk '{print $1}')
 
 URL="http://$HOST/api/ota?tamanho=$TAM&sha=$SHA"
 
-# Firmware para o LN882 é UF2 > enviar esse header a mais
-[[ "$FW" == *.uf2 ]] && echo ">> Modo LN882H"
+# LibreTiny (LN882H/BK7231N) utiliza firmware UF2
+[[ "$FW" == *.uf2 ]] && echo ">> Modo LibreTiny UF2"
 [[ "$FW" == *.uf2 ]] && MODOUF2=";type=application/octet-stream"
 
-CMD="curl -X POST -F \"firmware=@$FW$MODOUF2\" '$URL'"
+CMD="curl --fail-with-body -X POST -F \"firmware=@$FW$MODOUF2\" '$URL'"
 
 echo "============================"
 echo "Subindo FW: $FW"
@@ -30,4 +30,4 @@ echo "============================"
 echo $CMD
 echo
 
-curl -X POST -F "firmware=@$FW$MODOUF2" "$URL"
+curl --fail-with-body -X POST -F "firmware=@$FW$MODOUF2" "$URL"
