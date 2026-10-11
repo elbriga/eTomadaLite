@@ -2,6 +2,7 @@
 #include "platform.h"
 #include "loga.h"
 #include "util.h"
+#include "led.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..OTA..", nivel, fmt, ##__VA_ARGS__)
@@ -38,6 +39,9 @@ void apiOtaFlash()
     otaTamanhoEsperado = 0;
     otaTamanhoAtual = 0;
     otaDownloadUltimoPercentual = -1;
+
+    // Sinalizar OTA no LED
+    ledSet(true);
 
     if (!server.hasArg("tamanho"))
     {
@@ -193,6 +197,8 @@ void apiOtaFlash()
 
 void apiOtaFlashHelper()
 {
+  ledSet(false);
+
   if (otaErroMsg != nullptr || !otaConcluido)
   {
     if (Update.isRunning())
