@@ -10,7 +10,8 @@
 
 extern const HardwareProfile hardwareProfile;
 
-bool ledState;
+static bool ledState;
+static bool piscaAtivo;
 
 void ledInit()
 {
@@ -21,11 +22,7 @@ void ledInit()
   pinMode(hardwareProfile.led.pin, OUTPUT);                              // Led Azul do MINI
   digitalWrite(hardwareProfile.led.pin, !hardwareProfile.led.invertido); // No MINI LOW = Aceso!
 
-  // if (hardwareProfile.ledPin == RGB_LED_PIN)
-  // {
-  //   rgbLedInit();
-  //   rgbLedSetAnim(1); // Azul == Boot!
-  // }
+  piscaAtivo = hardwareProfile.led.pisca;
 }
 
 bool ledAtivo()
@@ -33,9 +30,18 @@ bool ledAtivo()
   return hardwareProfile.led.pin != 255;
 }
 
+void ledSet(bool estado)
+{
+  if (!ledAtivo())
+    return;
+
+  ledState = estado;
+  digitalWrite(hardwareProfile.led.pin, hardwareProfile.led.invertido ? !estado : estado);
+}
+
 void ledProcessa()
 {
-  if (!ledAtivo() || !hardwareProfile.led.piscar)
+  if (!piscaAtivo)
     return;
 
   // Sincronizado com o segundo!
