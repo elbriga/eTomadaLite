@@ -7,7 +7,6 @@
 #include "wifi.h"
 #include "mestre.h"
 #include "sensor.h"
-#include "mdns-gs.h"
 #include "http.h"
 #include "botao.h"
 
@@ -87,15 +86,15 @@ void apiConfig()
 
     configSave();
 
-    server.send(200, "application/json", R"({"ok":true,"msg":"hostname configurado"})");
+    server.send(200, "application/json", R"({"ok":true,"msg":"hostname configurado > reset WiFi!"})");
     httpLogaRequest("hostname configurado");
 
     logaM(LOG_NORMAL, "Hostname configurado. Reconectar");
 
+    logaFlush();
+
     delay(100);
     wifiConnect();
-    if (!wifiGetModoAP())
-      mdnsInit();
   }
   else if (server.hasArg("ssid") && server.hasArg("senha"))
   {
