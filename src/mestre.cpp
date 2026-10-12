@@ -16,12 +16,8 @@ struct Mestre
 {
     String deviceID;
     IPAddress ip;
-    uint32_t getIPms;
 };
 Mestre mestre = {};
-
-// Tempo máximo para considerar o IP do mestre válido (5 minutos)
-#define MESTRE_IP_TIMEOUT 300000
 
 extern Config config;
 
@@ -63,7 +59,7 @@ void mestreInit()
     logaM(LOG_AVISO, "Nodo Mestre: [%s] @ [%s]", mestre.deviceID.c_str(), ipStr);
 
     // Avisar nosso boot para o mestre
-    String json = "\"uptime\":" + String(millis());
+    String json = "\"tipo\":\"Lite\",\"uptime\":" + String(millis());
     mestreEnviaEvento(EVENTO_BOOT, "ETOMADA", json.c_str());
 
     sensorDigitalEnviaEvento();
