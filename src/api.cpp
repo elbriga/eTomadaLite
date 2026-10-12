@@ -65,11 +65,18 @@ void apiGetSnapshot()
       resposta += F(",");
     resposta += releGetRecursoJSON(i);
   }
-  resposta += F(",");
-  resposta += sensorGetRecursoJSON();
-  resposta += F(",");
-  resposta += botaoGetRecursoJSON();
-
+  if (sensorDigitalAtivo())
+  {
+    if (totReles)
+      resposta += F(",");
+    resposta += sensorGetRecursoJSON();
+  }
+  if (botaoAtivo())
+  {
+    if (totReles || sensorDigitalAtivo())
+      resposta += F(",");
+    resposta += botaoGetRecursoJSON();
+  }
   resposta += F("]}");
 
   server.send(200, "application/json", resposta);
