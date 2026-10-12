@@ -87,7 +87,7 @@ String releGetRecursoJSON(int index)
   resposta = F("{\"id\":\"R");
   resposta += String(index + 1);
   resposta += F("\",\"tipo\":\"RELE\",\"device\":{\"estado\":");
-  resposta += releLigado[index] ? "1" : "0";
+  resposta += releLigado[index] ? "true" : "false";
   resposta += F("}}");
 
   return resposta;
