@@ -48,6 +48,9 @@ void httpInit()
 
   server.on("/api/reset", HTTP_GET, apiReset);
 
+  server.on("/api/ping", HTTP_GET, []()
+            { server.send(204); });
+
   recoveryAPIRegister();
 
   server.on("/", HTTP_GET, httpRoot);
