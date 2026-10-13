@@ -5,7 +5,7 @@
 #include "hardwareProfile.h"
 #include "config.h"
 
-#define ETOMADA_LITE_VERSAO "2.0.0"
+#define ETOMADA_LITE_VERSAO "2.0.3"
 // 0.0.6 - led por TS
 // 0.0.7 - logaM e log remoto
 // 0.0.8 - modularizado
@@ -18,7 +18,9 @@
 // 1.0.0 - Suporte a LN882H
 // 1.0.1 - sensorDigital
 // 1.0.2 - Recurso Botao
-// 2.0.0 - del mDNS!
+// 2.0.0 - Teclado EKAZA
+// 2.0.1 - Multiplos Reles
+// 2.0.2 - del mDNS!
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("ETOMADA", nivel, fmt, ##__VA_ARGS__)
