@@ -3,7 +3,7 @@
 void releInit();
 int relesGetCount();
 
-void releSet(int index, bool ligado);
+void releSet(int index, bool ligado, bool enviaEvento = true);
 void releToggle(int index);
 bool releGetEstado(int index);
 
