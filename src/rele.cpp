@@ -33,7 +33,17 @@ void releInit()
   }
 }
 
-void releSet(int index, bool ligado)
+void releEnviaEvento(int index)
+{
+  String id = String("R") + String(index + 1);
+
+  String device = F("\"estado\":");
+  device += releLigado[index] ? "1" : "0";
+
+  mestreEnviaEvento(EVENTO_TOGGLE, id.c_str(), device.c_str());
+}
+
+void releSet(int index, bool ligado, bool enviaEvento)
 {
   if (index < 0 || index >= totReles)
   {
@@ -48,12 +58,8 @@ void releSet(int index, bool ligado)
 
   logaM(LOG_DEBUG0, "Rele [%d]: %s", index + 1, ligado ? "ON" : "OFF");
 
-  String id = String("R") + String(index + 1);
-
-  String device = F("\"estado\":");
-  device += ligado ? "1" : "0";
-
-  mestreEnviaEvento(EVENTO_TOGGLE, id.c_str(), device.c_str());
+  if (enviaEvento)
+    releEnviaEvento(index);
 }
 
 void releToggle(int index)
@@ -95,9 +101,9 @@ String releGetRecursoJSON(int index)
 
 void apiRele(int index, bool estado)
 {
-  logaM(LOG_NORMAL, "API set rele: %s", (estado ? "ON" : "OFF"));
+  logaM(LOG_NORMAL, "API set rele[%d]: %s", index + 1, (estado ? "ON" : "OFF"));
 
-  releSet(index, estado);
+  releSet(index, estado, false);
 
   String resposta;
   resposta.reserve(64);
@@ -106,11 +112,21 @@ void apiRele(int index, bool estado)
   resposta += "}";
 
   server.send(200, "application/json", resposta);
+
+  // Enviar o evento para o mestre depois de enviar a resposta
+  releEnviaEvento(index);
 }
 
 void apiReleSet()
 {
-  int index = server.hasArg("id") ? server.arg("id").toInt() - 1 : 0;
+  int index = 0; // Default
+  if (server.hasArg("id"))
+  {
+    String id = server.arg("id");
+    if (id.startsWith("R"))
+      id = id.substring(1); // Remover o "R"
+    index = id.toInt() - 1;
+  }
   if (index < 0 || index >= totReles)
   {
     server.send(400, "application/json", R"({"ok":false,"msg":"invalid id"})");
@@ -142,5 +158,6 @@ void apiReleToggle()
     server.send(400, "application/json", R"({"ok":false,"msg":"invalid id"})");
     return;
   }
-  releToggle(index);
+
+  apiRele(index, !releLigado[index]);
 }
