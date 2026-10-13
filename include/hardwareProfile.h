@@ -50,6 +50,8 @@ typedef struct
 #include "hardware/esp01.h"
 #elif defined(HW_EKAZA_6TECLAS)
 #include "hardware/ekaza-6teclas.h"
+#elif defined(HW_EKAZA_3TECLAS)
+#include "hardware/ekaza-3teclas.h"
 #else
 #error "Nenhum Hardware Profile definido."
 #endif
