@@ -11,8 +11,13 @@
 #include "botao.h"
 #include "ntp.h"
 #include "sensor.h"
-#include "tecladoEkaza.h"
 #include "backlight.h"
+
+#ifdef HW_EKAZA_6TECLAS
+#include "tecladoEkazaSerial.h"
+#elif HW_EKAZA_3TECLAS
+#include "tecladoEkazaParalelo.h"
+#endif
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..APP..", nivel, fmt, ##__VA_ARGS__)
@@ -52,7 +57,9 @@ void appInit()
   sensorDigitalInit();
 
 #ifdef HW_EKAZA_6TECLAS
-  tecladoEkazaInit();
+  tecladoEkazaSerialInit();
+#elif HW_EKAZA_3TECLAS
+  tecladoEkazaParaleloInit();
 #endif
 
   wifiConnect();
@@ -99,6 +106,8 @@ void appLoop()
 
 #ifdef HW_EKAZA_6TECLAS
   tecladoEkazaProcessa();
+#elif HW_EKAZA_3TECLAS
+  tecladoEkazaParaleloLoop();
 #endif
 
   httpProcessa();

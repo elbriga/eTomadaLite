@@ -2,12 +2,14 @@
 #include <cstring>
 
 #include "loga.h"
-#include "tecladoEkaza.h"
+#include "tecladoEkazaSerial.h"
 #include "rele.h"
 #include "backlight.h"
 
+// Teclado Serial do EKAZA6
+
 // Função de log para esta modulo
-#define logaM(nivel, fmt, ...) loga(".EKAZA.", nivel, fmt, ##__VA_ARGS__)
+#define logaM(nivel, fmt, ...) loga("TECSEKZ", nivel, fmt, ##__VA_ARGS__)
 
 enum TecladoEkazaEventoTipo : uint8_t
 {
@@ -127,7 +129,7 @@ namespace
     }
 }
 
-void tecladoEkazaInit()
+void tecladoEkazaSerialInit()
 {
     framePos = 0;
     ultimoByteMs = 0;
@@ -139,7 +141,7 @@ void tecladoEkazaInit()
     Serial1.begin(9600);
 }
 
-void tecladoEkazaLoop()
+void tecladoEkazaSerialLoop()
 {
     uint32_t agora;
 
@@ -156,7 +158,7 @@ void tecladoEkazaLoop()
     }
 }
 
-bool tecladoEkazaProximoEvento(TecladoEkazaEvento &evento)
+bool tecladoEkazaSerialProximoEvento(TecladoEkazaEvento &evento)
 {
     if (!filaCount)
         return false;
@@ -170,12 +172,12 @@ bool tecladoEkazaProximoEvento(TecladoEkazaEvento &evento)
 }
 
 // chamado no loop principal de 5ms/5ms
-void tecladoEkazaProcessa()
+void tecladoEkazaSerialProcessa()
 {
-    tecladoEkazaLoop();
+    tecladoEkazaSerialLoop();
 
     TecladoEkazaEvento evento;
-    while (tecladoEkazaProximoEvento(evento))
+    while (tecladoEkazaSerialProximoEvento(evento))
     {
         logaM(LOG_NORMAL, "EKAZA: tecla %u, evento %u", evento.tecla, evento.tipo);
 

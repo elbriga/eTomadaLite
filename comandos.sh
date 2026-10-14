@@ -43,3 +43,37 @@ bk7231tools write_flash -d /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A5069RR4-i
 # Ouvir a porta serial
 stty -F /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A5069RR4-if00-port0 115200 raw -echo -echoe -echok
 cat /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A5069RR4-if00-port0
+
+
+
+== EKAZA3 - BK7238 ==
+ADD
+build_flags =
+    -Wl,--undefined=lt_init_family
+
+MINHAS ALTERAÇÕES no github, branch (bk7238-lt_init_family-uart-fix):
+e no arquivo:
+~/.platformio/platforms/libretiny/cores/beken-72xx/base/api/lt_init.c
+ void lt_init_family() {
+     // set default UART output port
+     uart_print_port = LT_UART_DEFAULT_PORT - 1;
+     // initialize the UART (needed e.g. after deep sleep)
+-    if (uart_print_port == 1)
++    if (uart_print_port == 0)
+         uart1_init();
+-    else if (uart_print_port == 2)
++    else if (uart_print_port == 1)
+         uart2_init();
+ }
+ 
+ No arquivo:
+~/.platformio/platforms/libretiny/cores/beken-72xx/base/fixups/arch_main.c
+ #include "start_type_pub.h"
++#include "uart_pub.h"
++
++extern void uart_fast_init(void);
+
+E
+ void entry_main(void) {
++    uart_print_port = UART2_PORT;
++    uart_fast_init();
