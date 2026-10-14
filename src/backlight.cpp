@@ -24,6 +24,7 @@ void backlightInit()
 
   logaM(LOG_NORMAL, "Ativando backlight em [%d]", hardwareProfile.backlight.pin);
 
+  backlightState = true;
   pinMode(hardwareProfile.backlight.pin, OUTPUT);                                    // Led Azul do MINI
   digitalWrite(hardwareProfile.backlight.pin, !hardwareProfile.backlight.invertido); // No MINI LOW = Aceso!
 }
