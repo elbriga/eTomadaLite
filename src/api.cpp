@@ -79,6 +79,8 @@ void apiGetSnapshot()
   }
   resposta += F("]}");
 
+  server.sendHeader("X-eTomada", "Lite");
+  server.sendHeader("X-Versao", eTomadaLiteVersion());
   server.send(200, "application/json", resposta);
   httpLogaRequest("OK");
 }
