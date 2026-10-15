@@ -31,7 +31,6 @@ static uint8_t logQueueQuantidade = 0;
 
 static String logaServerURL = "http://" + String(LOG_SERVER) + "/api/log"; // TODO :: configuravel
 
-const char *logaGetNivelTxt(LogLevel nivel);
 void logaInit()
 {
   logaM(LOG_NORMAL, "Nivel de log: %s", logaGetNivelTxt(logLevel));
@@ -129,6 +128,11 @@ const char *logaGetNivelTxt(LogLevel nivel)
   default:
     return "??????";
   }
+}
+
+const char *logaGetNivelAtual()
+{
+  return logaGetNivelTxt(logLevel);
 }
 
 void logaV(const char *modulo, LogLevel nivel, const char *fmt, va_list args)

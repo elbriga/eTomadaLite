@@ -41,6 +41,7 @@ void appInit()
 
   logaM(LOG_NORMAL, "Hostname: %s", eTomadaLiteDeviceID().c_str());
   logaM(LOG_NORMAL, "Versao: %s", eTomadaLiteVersion().c_str());
+  logaM(LOG_NORMAL, "Log Level: %s", logaGetNivelAtual());
 
   logaM(LOG_NORMAL, "MAC: %s", WiFi.macAddress().c_str());
   logaM(LOG_NORMAL, "Flash: %u bytes", ESP.getFlashChipSize());
@@ -105,7 +106,7 @@ void appLoop()
   botaoProcessa();
 
 #ifdef HW_EKAZA_6TECLAS
-  tecladoEkazaProcessa();
+  tecladoEkazaSerialProcessa();
 #elif HW_EKAZA_3TECLAS
   tecladoEkazaParaleloLoop();
 #endif

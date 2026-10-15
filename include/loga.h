@@ -20,5 +20,7 @@ void loga(const char *modulo, LogLevel nivel, const char *fmt, ...);
 void logaV(const char *modulo, LogLevel nivel, const char *fmt, va_list args);
 
 void logaTitulo(const char *msg);
+
 LogLevel logaSetLevel(LogLevel level);
 const char *logaGetNivelTxt(LogLevel nivel);
+const char *logaGetNivelAtual();
