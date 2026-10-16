@@ -11,7 +11,7 @@
 #define TOUCH_K2 16
 #define TOUCH_K3 17
 
-#define TOUCH_DEBOUNCE_MS 30
+#define TOUCH_DEBOUNCE_MS 15
 #define TOUCH_LONGPRESS_MS 800
 
 struct TouchTecla
