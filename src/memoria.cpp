@@ -13,6 +13,6 @@ void memoriaLog(const char *onde)
     if (livre < memoriaMinimo)
         memoriaMinimo = livre;
 
-    logaM(LOG_AVISO, "MEMLOG [%s] : free=%u min=%u maxAlloc=%u",
+    logaM(LOG_DEBUG0, "MEMLOG [%s] : free=%u min=%u maxAlloc=%u",
           onde, livre, memoriaMinimo, ESP.getMaxFreeBlockSize());
 }
