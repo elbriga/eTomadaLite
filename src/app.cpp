@@ -78,10 +78,11 @@ void appInit()
   logaM(LOG_NORMAL, "Inicializacao concluida.");
 }
 
-static time_t ultimoSegundo = -1;
-static time_t tsTimerHora = 0;
 void appLoop()
 {
+  static time_t ultimoSegundo = -1;
+  static time_t ultimaHora = -1;
+
   struct tm timeinfo;
   time_t now = time(nullptr);
   localtime_r(&now, &timeinfo);
@@ -94,10 +95,11 @@ void appLoop()
     sensorDigitalProcessa();
 
     // 1h/1h
-    if (now - tsTimerHora > 60 * 60)
+    if (ultimaHora != timeinfo.tm_hour)
     {
+      ultimaHora = timeinfo.tm_hour;
+
       memoriaLog("1h/1h");
-      tsTimerHora = now;
     }
   }
 
