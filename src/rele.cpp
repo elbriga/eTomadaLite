@@ -111,10 +111,14 @@ void apiRele(int index, bool estado)
   resposta += releGetRecursoJSON(index);
   resposta += "}";
 
+  bool fromMestre = server.client().remoteIP() == mestreGetIP();
   server.send(200, "application/json", resposta);
 
-  // Enviar o evento para o mestre depois de enviar a resposta
-  releEnviaEvento(index);
+  if (!fromMestre)
+  {
+    // Enviar o evento para o mestre depois de enviar a resposta
+    releEnviaEvento(index);
+  }
 }
 
 void apiReleSet()
