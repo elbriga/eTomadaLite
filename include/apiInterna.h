@@ -1,4 +1,4 @@
 #pragma once
 #include "platform.h"
 
-bool apiInternaEnviaEvento(IPAddress ip, const char *body);
+bool apiInternaEnviaEvento(IPAddress ip, int port, const char *body);

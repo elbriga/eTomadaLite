@@ -16,6 +16,7 @@ struct Mestre
 {
     String deviceID;
     IPAddress ip;
+    int port;
 };
 Mestre mestre = {};
 
@@ -31,11 +32,19 @@ const char *mestreGetID()
     return mestre.deviceID.c_str();
 }
 
+IPAddress mestreGetIP()
+{
+    return mestre.ip;
+}
+
 void mestreInit()
 {
-    mestre.deviceID = String(config.mestre);
-    mestre.ip = IPAddress();
+    // migracao > mestre = server
+    mestre.deviceID = "SERVER"; // String(config.mestre);
+    mestre.ip = IPAddress(10, 0, 0, 1);
+    mestre.port = 8080;
 
+    /*
     if (mestre.deviceID == "")
     {
         logaM(LOG_AVISO, "Sem MESTRE configurado!");
@@ -53,10 +62,11 @@ void mestreInit()
         logaM(LOG_CRITICO, "Falha ao resolver o IP do MESTRE 2");
         return;
     }
+    */
 
     char ipStr[16];
     utilIPToString(mestre.ip, ipStr, sizeof(ipStr));
-    logaM(LOG_AVISO, "Nodo Mestre: [%s] @ [%s]", mestre.deviceID.c_str(), ipStr);
+    logaM(LOG_AVISO, "Nodo Mestre: [%s] @ [%s:%d]", mestre.deviceID.c_str(), ipStr, mestre.port);
 
     // Avisar nosso boot para o mestre
     String json = "\"tipo\":\"Lite\",\"uptime\":" + String(millis());
@@ -99,5 +109,5 @@ void mestreEnviaEvento(TipoEvento tipoEvento, const char *id, const char *device
     body += deviceJson;
     body += F("}}");
 
-    apiInternaEnviaEvento(mestre.ip, body.c_str());
+    apiInternaEnviaEvento(mestre.ip, mestre.port, body.c_str());
 }

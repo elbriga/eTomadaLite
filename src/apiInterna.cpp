@@ -9,7 +9,7 @@
 #define API_INTERNA_TIMEOUT 1000
 #define API_INTERNA_RESPONSE_MAXLEN 256
 
-int apiInterna(const char *host, const char *endpoint, const char *request, char *response);
+int apiInterna(const char *host, int port, const char *endpoint, const char *request, char *response);
 /*
 String apiInternaGetSnapshot(NodoRemoto *nodo, JsonDocument &doc)
 {
@@ -54,17 +54,17 @@ String apiInternaSetRecurso(Recurso *recurso, String estado)
   return resposta["msg"].as<String>();
 }
 */
-bool apiInternaEnviaEvento(IPAddress ip, const char *body)
+bool apiInternaEnviaEvento(IPAddress ip, int port, const char *body)
 {
   char ipStr[16];
   utilIPToString(ip, ipStr, 16);
-  int code = apiInterna(ipStr, "evento", body, nullptr);
+  int code = apiInterna(ipStr, port, "evento", body, nullptr);
   return code == 200;
 }
 
-int apiInterna(const char *host, const char *endpoint, const char *request, char *responseOut)
+int apiInterna(const char *host, int port, const char *endpoint, const char *request, char *responseOut)
 {
-  String url = "http://" + String(host) + "/api/" + endpoint;
+  String url = "http://" + String(host) + (port == 80 ? "" : ":" + String(port)) + "/api/" + endpoint;
 
   logaM(LOG_DEBUG0, "apiInterna: Acionando %s", url.c_str());
   logaM(LOG_DEBUG0, "body: [%s]", request);
