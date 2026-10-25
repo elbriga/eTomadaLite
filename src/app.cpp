@@ -1,4 +1,5 @@
 #include "eTomadaLite.h"
+#include "server.h"
 #include "recovery.h"
 #include "loga.h"
 #include "config.h"
@@ -7,7 +8,6 @@
 #include "http.h"
 #include "led.h"
 #include "memoria.h"
-#include "mestre.h"
 #include "botao.h"
 #include "ntp.h"
 #include "sensor.h"
@@ -31,6 +31,8 @@ void appInit()
 {
   Serial.println();
   Serial.println();
+
+  serverInit();
 
   configLoad(); // Inicializar primeiro para usar o deviceID no log
   logaInit();
@@ -63,6 +65,7 @@ void appInit()
   tecladoEkazaParaleloInit();
 #endif
 
+  // Rede
   wifiConnect();
   modoAP = wifiGetModoAP();
 
@@ -71,7 +74,10 @@ void appInit()
   if (!modoAP)
   {
     ntpInit();
-    mestreInit();
+
+    serverEnviaSnapshot();
+
+    sensorDigitalEnviaEvento();
   }
 
   ledSet(false);
@@ -114,6 +120,7 @@ void appLoop()
 #endif
 
   httpProcessa();
+
   if (!modoAP)
     logaProcessa();
 

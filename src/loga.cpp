@@ -10,8 +10,6 @@
 static LogLevel logLevel = LOG_DEBUG;
 
 #define LOG_MESSAGE_SIZE 256
-
-#define LOG_SERVER "10.0.0.1:8080"
 #define LOG_QUEUE_SIZE 32
 
 struct LogRemoto
@@ -29,10 +27,12 @@ static uint8_t logQueueInicio = 0;
 static uint8_t logQueueFim = 0;
 static uint8_t logQueueQuantidade = 0;
 
-static String logaServerURL = "http://" + String(LOG_SERVER) + "/api/log"; // TODO :: configuravel
+static String logaServerURL;
 
 void logaInit()
 {
+  logaServerURL = "http://" + String(serverGetIPPortStr()) + "/api/log";
+
   logaM(LOG_NORMAL, "Nivel de log: %s", logaGetNivelTxt(logLevel));
   logaM(LOG_NORMAL, "Log Server: %s", logaServerURL.c_str());
 }

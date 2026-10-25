@@ -75,7 +75,6 @@ void configDefaults()
   // TESTES
   // config.logLevel = LOG_DEBUG;
   // strlcpy(config.deviceID, "TECLADO", sizeof(config.deviceID));
-  // strlcpy(config.mestre, "MESTRE", sizeof(config.mestre));
   // strlcpy(config.ssid, "GLS", sizeof(config.ssid));
   // strlcpy(config.senha, "Lola09876543*", sizeof(config.senha));
 

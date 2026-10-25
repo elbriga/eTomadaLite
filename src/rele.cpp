@@ -1,8 +1,8 @@
+#include "eTomadaLite.h"
 #include "platform.h"
 #include "loga.h"
 #include "rele.h"
 #include "hardwareProfile.h"
-#include "mestre.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".RELE..", nivel, fmt, ##__VA_ARGS__)
@@ -40,7 +40,7 @@ void releEnviaEvento(int index)
   String device = F("\"estado\":");
   device += releLigado[index] ? "1" : "0";
 
-  mestreEnviaEvento(EVENTO_TOGGLE, id.c_str(), device.c_str());
+  serverEnviaEvento(EVENTO_TOGGLE, id.c_str(), device.c_str());
 }
 
 void releSet(int index, bool ligado, bool enviaEvento)
@@ -111,14 +111,11 @@ void apiRele(int index, bool estado)
   resposta += releGetRecursoJSON(index);
   resposta += "}";
 
-  bool fromMestre = server.client().remoteIP() == mestreGetIP();
+  bool fromServer = server.client().remoteIP() == serverGetIP();
   server.send(200, "application/json", resposta);
 
-  if (!fromMestre)
-  {
-    // Enviar o evento para o mestre depois de enviar a resposta
+  if (!fromServer)
     releEnviaEvento(index);
-  }
 }
 
 void apiReleSet()

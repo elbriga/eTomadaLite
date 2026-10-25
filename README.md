@@ -86,7 +86,6 @@ main.cpp
        +-- ntp
        +-- rele
        +-- botao
-       +-- mestre
        +-- log
 ```
 
@@ -240,7 +239,7 @@ struct Config
     char senha[32];
 
     char deviceID[32];
-    char mestre[32];
+    char mestre[32]; // obsoleto
 };
 ```
 
@@ -466,59 +465,6 @@ rssi
 uptime
 ```
 
-## mDNS
-
-Quando conectado à rede normal, o eTomada Lite anuncia:
-
-```text
-_etomada._tcp
-```
-
-na porta:
-
-```text
-80
-```
-
-São publicados registros TXT com informações do dispositivo:
-
-```text
-device
-id
-ssid
-ip
-mac
-model
-board
-fw
-api
-```
-
-Por exemplo:
-
-```text
-device=eTomada
-api=Lite
-```
-
-Isso permite que controladores encontrem automaticamente dispositivos eTomada na rede.
-
-### Limitação atual do LN882H
-
-O anúncio mDNS funciona através da implementação disponível no LibreTiny.
-
-Entretanto, a descoberta de outros serviços através de:
-
-```cpp
-MDNS.queryService()
-```
-
-está implementada atualmente apenas para ESP8266.
-
-Por isso, a descoberta automática do **nodo Mestre** ainda não está disponível no LN882H.
-
-Essa é atualmente uma das poucas diferenças funcionais entre as arquiteturas.
-
 ## NTP
 
 O eTomada Lite sincroniza o relógio utilizando:
@@ -549,7 +495,7 @@ CHANGED
 HORARIO
 ```
 
-O botão/interruptor local pode gerar eventos que são enviados ao nodo Mestre através da API HTTP interna.
+O botão/interruptor local pode gerar eventos que são enviados ao SERVER através da API HTTP interna.
 
 ## Log remoto
 
@@ -592,13 +538,13 @@ A fila evita bloquear a aplicação durante a geração dos logs e descarta os r
 └── src/
     ├── main.cpp
     ├── app.cpp
+    ├── server.cpp
     ├── config.cpp
     ├── wifi.cpp
     ├── http.cpp
     ├── ota.cpp
     ├── recovery.cpp
     ├── mdns-gs.cpp
-    ├── mestre.cpp
     ├── rele.cpp
     ├── botao.cpp
     └── ...

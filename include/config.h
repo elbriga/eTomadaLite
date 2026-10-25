@@ -17,7 +17,7 @@ struct Config
   char senha[32];
 
   char deviceID[32];
-  char mestre[32];
+  char mestre[32]; // obsoleto
 
   int logLevel;
 }; // 132 bytes

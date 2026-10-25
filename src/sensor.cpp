@@ -2,7 +2,6 @@
 #include "loga.h"
 #include "hardwareProfile.h"
 #include "sensor.h"
-#include "mestre.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("SENSOR.", nivel, fmt, ##__VA_ARGS__)
@@ -90,5 +89,5 @@ void sensorDigitalEnviaEvento()
     String device = F("\"valor\":");
     device += sensorDigital.estado ? "1" : "0";
 
-    mestreEnviaEvento(EVENTO_VALOR_MUDOU, "S1", device.c_str());
+    serverEnviaEvento(EVENTO_VALOR_MUDOU, "S1", device.c_str());
 }

@@ -1,12 +1,9 @@
 #include "eTomadaLite.h"
 #include "platform.h"
 #include "loga.h"
-#include "rele.h"
 #include "config.h"
 #include "util.h"
 #include "wifi.h"
-#include "mestre.h"
-#include "sensor.h"
 #include "http.h"
 #include "botao.h"
 
@@ -18,71 +15,14 @@ extern Config config;
 
 void apiGetSnapshot()
 {
-  String resposta;
-
-  resposta.reserve(256);
-
-  resposta = F("{\"device\":\"eTomada\",\"api\":\"Lite\",");
-
-  resposta += F("\"fw_version\":\"");
-  resposta += eTomadaLiteVersion();
-
-  resposta += F("\",\"device_id\":\"");
-  resposta += eTomadaLiteDeviceID();
-  resposta += F("\",\"device_model\":\"");
-  resposta += eTomadaLiteDeviceModel();
-  resposta += F("\",\"device_board\":\"");
-  resposta += eTomadaLiteDeviceBoard();
-
-  if (mestreAtivo())
-  {
-    resposta += F("\",\"mestre\":\"");
-    resposta += mestreGetID();
-  }
-
-  resposta += F("\",\"uptime\":");
-  resposta += millis();
-
-  resposta += F(",\"mac\":\"");
-  resposta += WiFi.macAddress();
-
-  resposta += F("\",\"ip\":\"");
-  char ipBuffer[16];
-  utilIPToString(WiFi.localIP(), ipBuffer, 16);
-  resposta += ipBuffer;
-
-  resposta += F("\",\"ssid\":\"");
-  resposta += WiFi.SSID();
-
-  resposta += F("\",\"wifiPower\":");
-  resposta += String(WiFi.RSSI());
-
-  resposta += F(",\"recursos\":[");
-  int totReles = relesGetCount();
-  for (int i = 0; i < totReles; i++)
-  {
-    if (i > 0)
-      resposta += F(",");
-    resposta += releGetRecursoJSON(i);
-  }
-  if (sensorDigitalAtivo())
-  {
-    if (totReles)
-      resposta += F(",");
-    resposta += sensorGetRecursoJSON();
-  }
-  if (botaoAtivo())
-  {
-    if (totReles || sensorDigitalAtivo())
-      resposta += F(",");
-    resposta += botaoGetRecursoJSON();
-  }
-  resposta += F("]}");
+  String resposta = eTomadaLiteGetSnapshot();
 
   server.sendHeader("X-eTomada", "Lite");
   server.sendHeader("X-Versao", eTomadaLiteVersion());
   server.send(200, "application/json", resposta);
-  httpLogaRequest("OK");
+
+  // TODO if ip != SERVER
+  // httpLogaRequest("OK");
 }
 
 void apiConfig()
@@ -135,21 +75,6 @@ void apiConfig()
     httpLogaRequest("Log Level configurado");
 
     logaM(LOG_NORMAL, "Log Level setado para [%s]", logaGetNivelTxt((LogLevel)config.logLevel));
-  }
-  else if (server.hasArg("mestre"))
-  {
-    String mestre = server.arg("mestre");
-    // TODO :: limpar string
-    strlcpy(config.mestre, mestre.c_str(), sizeof(config.mestre));
-
-    configSave();
-
-    server.send(200, "application/json", R"({"ok":true,"msg":"mestre configurado"})");
-    httpLogaRequest("Mestre configurado");
-
-    logaM(LOG_NORMAL, "Mestre configurado. Reinit mestre");
-
-    mestreInit();
   }
   else
   {

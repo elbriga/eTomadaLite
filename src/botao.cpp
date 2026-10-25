@@ -1,11 +1,9 @@
 #include <Arduino.h>
 
 #include "eTomadaLite.h"
-#include "mestre.h"
 #include "hardwareProfile.h"
 #include "botao.h"
 #include "loga.h"
-#include "http.h"
 #include "eventos.h"
 
 // Função de log para esta modulo
@@ -87,7 +85,7 @@ void botaoProcessa()
       String device = F("\"estado\":");
       device += leitura ? "true" : "false";
 
-      mestreEnviaEvento(EVENTO_TOGGLE, "B1", device.c_str());
+      serverEnviaEvento(EVENTO_TOGGLE, "B1", device.c_str());
 
       /*
       eventoPost(botao->estado ? EVENTO_LIGOU : EVENTO_DESLIGOU, atual[rb].rec, true, true);
