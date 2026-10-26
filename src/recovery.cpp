@@ -453,7 +453,7 @@ void recoveryAPIRegister()
 
     server.on(
         "/api/reboot",
-        HTTP_POST,
+        HTTP_GET,
         []()
         {
             server.send(
@@ -483,7 +483,7 @@ static void recoveryHttpInit()
                   String ssid = modoAP ? apSSID : WiFi.SSID();
 
                   String resposta;
-                  resposta.reserve(192);
+                  resposta.reserve(256);
 
                   resposta = F("{\"mode\":\"recovery\",\"ssid\":\"");
                   resposta += ssid;
@@ -496,6 +496,12 @@ static void recoveryHttpInit()
 
                   resposta += F(",\"uptime\":");
                   resposta += millis();
+
+                  resposta += F(",\"mac\":\"");
+                  resposta += WiFi.macAddress();
+                  resposta += F("\",\"device_id\":\"");
+                  resposta += config.deviceID;
+                  resposta += F("\"");
 
                   resposta += "}";
 
