@@ -6,12 +6,16 @@
 const HardwareProfile hardwareProfile = {
     .modelo = "EKAZA3_2",
     .board = "cbu",
-    .led = {.pin = PIN_P8, .invertido = false, .pisca = false},
+    .led = {.pin = 255},
     .rele = {
-        .pin = {PIN_P15, PIN_P17, PIN_P8, PIN_P23, PIN_P22, PIN_P20, PIN_P16, PIN_P14},
+        .pin = {PIN_P24, PIN_P6, PIN_P26, 255},
         .invertido = false,
     },
     .botao = {.pin = 255},
     .sensorDigital = {.pin = 255},
-    .backlight = {.pin = PIN_P7, .invertido = true},
+    .backlight = {.pin = 255},
 };
+
+// LED1 - P14 invertido
+// LED2 - P16 invertido
+// LED3 - P20 invertido

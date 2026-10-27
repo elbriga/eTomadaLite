@@ -62,9 +62,11 @@ void releSet(int index, bool ligado, bool enviaEvento)
     releEnviaEvento(index);
 }
 
-void releToggle(int index)
+bool releToggle(int index)
 {
-  releSet(index, !releLigado[index]);
+  bool estado = !releLigado[index];
+  releSet(index, estado);
+  return estado;
 }
 
 bool releGetEstado(int index)

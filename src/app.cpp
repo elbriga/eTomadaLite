@@ -71,7 +71,7 @@ void appInit()
 #elif HW_EKAZA_3TECLAS
   tecladoEkazaParaleloInit(14, 16, 17);
 #elif HW_EKAZA_3TECLAS2
-  tecladoEkazaParaleloInit(PIN_P23, PIN_P9, PIN_P28);
+  tecladoEkazaParaleloInit(PIN_P23, PIN_P9, PIN_P28, PIN_P14, PIN_P16, PIN_P20);
 #endif
 
   // Rede
