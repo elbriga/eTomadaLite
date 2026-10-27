@@ -7,10 +7,6 @@
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("TECPEKZ", nivel, fmt, ##__VA_ARGS__)
 
-#define TOUCH_K1 14
-#define TOUCH_K2 16
-#define TOUCH_K3 17
-
 #define TOUCH_DEBOUNCE_MS 15
 #define TOUCH_LONGPRESS_MS 800
 
@@ -23,12 +19,7 @@ struct TouchTecla
     uint32_t mudouEm;
     uint32_t pressionadoEm;
 };
-
-static TouchTecla teclas[] = {
-    {.pin = TOUCH_K1},
-    {.pin = TOUCH_K2},
-    {.pin = TOUCH_K3},
-};
+static TouchTecla teclas[] = {};
 
 static void tecladoEkazaParaleloEvento(uint8_t tecla, bool longo)
 {
@@ -40,8 +31,12 @@ static void tecladoEkazaParaleloEvento(uint8_t tecla, bool longo)
         releToggle(tecla - 1);
 }
 
-void tecladoEkazaParaleloInit()
+void tecladoEkazaParaleloInit(int k1, int k2, int k3)
 {
+    teclas[0].pin = k1;
+    teclas[1].pin = k2;
+    teclas[2].pin = k3;
+
     logaM(LOG_NORMAL, "Ativando teclado EKAZA paralelo de 3 teclas");
 
     uint32_t agora = millis();

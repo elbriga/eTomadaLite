@@ -1,6 +1,5 @@
 #include "eTomadaLite.h"
 #include "server.h"
-#include "recovery.h"
 #include "loga.h"
 #include "config.h"
 #include "rele.h"
@@ -12,15 +11,20 @@
 #include "ntp.h"
 #include "sensor.h"
 #include "backlight.h"
+#include "hardwareProfile.h"
 
 #ifdef HW_EKAZA_6TECLAS
 #include "tecladoEkazaSerial.h"
 #elif HW_EKAZA_3TECLAS
 #include "tecladoEkazaParalelo.h"
+#elif HW_EKAZA_3TECLAS2
+#include "tecladoEkazaParalelo.h"
 #endif
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("..APP..", nivel, fmt, ##__VA_ARGS__)
+
+extern const HardwareProfile hardwareProfile;
 
 static bool modoAP = false;
 
@@ -45,6 +49,9 @@ void appInit()
   logaM(LOG_NORMAL, "Versao: %s", eTomadaLiteVersion().c_str());
   logaM(LOG_NORMAL, "Log Level: %s", logaGetNivelAtual());
 
+  logaM(LOG_NORMAL, "Modelo: %s", hardwareProfile.modelo);
+  logaM(LOG_NORMAL, "Board: %s", hardwareProfile.board);
+
   logaM(LOG_NORMAL, "MAC: %s", WiFi.macAddress().c_str());
   logaM(LOG_NORMAL, "Flash: %u bytes", ESP.getFlashChipSize());
 #if defined(ESP8266)
@@ -62,7 +69,9 @@ void appInit()
 #ifdef HW_EKAZA_6TECLAS
   tecladoEkazaSerialInit();
 #elif HW_EKAZA_3TECLAS
-  tecladoEkazaParaleloInit();
+  tecladoEkazaParaleloInit(14, 16, 17);
+#elif HW_EKAZA_3TECLAS2
+  tecladoEkazaParaleloInit(PIN_P23, PIN_P9, PIN_P28);
 #endif
 
   // Rede
@@ -116,6 +125,8 @@ void appLoop()
 #ifdef HW_EKAZA_6TECLAS
   tecladoEkazaSerialProcessa();
 #elif HW_EKAZA_3TECLAS
+  tecladoEkazaParaleloLoop();
+#elif HW_EKAZA_3TECLAS2
   tecladoEkazaParaleloLoop();
 #endif
 

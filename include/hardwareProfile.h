@@ -52,6 +52,8 @@ typedef struct
 #include "hardware/ekaza-6teclas.h"
 #elif defined(HW_EKAZA_3TECLAS)
 #include "hardware/ekaza-3teclas.h"
+#elif defined(HW_EKAZA_3TECLAS2)
+#include "hardware/ekaza-3teclas2.h"
 #else
 #error "Nenhum Hardware Profile definido."
 #endif
