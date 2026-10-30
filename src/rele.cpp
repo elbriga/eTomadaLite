@@ -204,11 +204,11 @@ void apiRelesSet()
 
     String item = comandos.substring(inicio, fim);
 
-    // Formatos aceitos: R1:ON e R1:OFF (ate R8).
+    // Formatos aceitos: R1_ON e R1_OFF (ate R8).
     if ((item.length() != 5 && item.length() != 6) ||
         item[0] != 'R' ||
         item[1] < '1' || item[1] > '8' ||
-        item[2] != ':')
+        item[2] != '_')
     {
       erro();
       return;

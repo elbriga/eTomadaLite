@@ -10,7 +10,7 @@
 #include "botao.h"
 #include "util.h"
 
-#define ETOMADA_LITE_VERSAO "4.0.1"
+#define ETOMADA_LITE_VERSAO "4.0.2"
 // 0.0.6 - led por TS
 // 0.0.7 - logaM e log remoto
 // 0.0.8 - modularizado
@@ -29,6 +29,7 @@
 // 3.0.0 - Suporte a BK7238 e Teclado paralelo EKAZA3
 // 4.0.0 - DEL mestre > Ave SERVER
 // 4.0.1 - Suporte novo EKAZA3_2
+// 4.0.2 - comandos em lote
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("ETOMADA", nivel, fmt, ##__VA_ARGS__)
