@@ -10,4 +10,5 @@ bool releGetEstado(int index);
 String releGetRecursoJSON(int index);
 
 void apiReleSet();
+void apiRelesSet();
 void apiReleToggle();

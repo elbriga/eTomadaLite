@@ -164,3 +164,122 @@ void apiReleToggle()
 
   apiRele(index, !releLigado[index]);
 }
+
+void apiRelesSet()
+{
+  if (!server.hasArg("estados"))
+  {
+    server.send(400, "application/json",
+                R"({"ok":false,"msg":"missing estados"})");
+    return;
+  }
+
+  String comandos = server.arg("estados");
+
+  if (comandos.isEmpty() || comandos.length() > 80)
+  {
+    server.send(400, "application/json",
+                R"({"ok":false,"msg":"invalid estados"})");
+    return;
+  }
+
+  int indices[MAX_RELES];
+  bool estados[MAX_RELES];
+  bool vistos[MAX_RELES] = {};
+  int total = 0;
+
+  auto erro = [&]()
+  {
+    server.send(400, "application/json",
+                R"({"ok":false,"msg":"invalid estados"})");
+  };
+
+  // Validar o lote inteiro antes de alterar qualquer rele.
+  int inicio = 0;
+  while (inicio < (int)comandos.length())
+  {
+    int fim = comandos.indexOf('-', inicio);
+    if (fim < 0)
+      fim = comandos.length();
+
+    String item = comandos.substring(inicio, fim);
+
+    // Formatos aceitos: R1:ON e R1:OFF (ate R8).
+    if ((item.length() != 5 && item.length() != 6) ||
+        item[0] != 'R' ||
+        item[1] < '1' || item[1] > '8' ||
+        item[2] != ':')
+    {
+      erro();
+      return;
+    }
+
+    int index = item[1] - '1';
+    String estado = item.substring(3);
+
+    if (index >= totReles ||
+        vistos[index] ||
+        total >= MAX_RELES ||
+        (estado != "ON" && estado != "OFF"))
+    {
+      erro();
+      return;
+    }
+
+    vistos[index] = true;
+    indices[total] = index;
+    estados[total] = estado == "ON";
+    total++;
+
+    if (fim == (int)comandos.length())
+      break;
+
+    inicio = fim + 1;
+
+    if (inicio == (int)comandos.length())
+    {
+      erro();
+      return;
+    }
+  }
+
+  bool fromServer = server.client().remoteIP() == serverGetIP();
+
+  String resposta;
+  resposta.reserve(70 + total * 110);
+
+  resposta = F("{\"ok\":true,\"total\":");
+  resposta += total;
+  resposta += F(",\"aplicados\":");
+  resposta += total;
+  resposta += F(",\"resultados\":[");
+
+  // Aplicar os estados e montar as confirmacoes individuais.
+  for (int i = 0; i < total; i++)
+  {
+    int index = indices[i];
+
+    releSet(index, estados[i], false);
+
+    if (i > 0)
+      resposta += ',';
+
+    resposta += F("{\"id\":\"R");
+    resposta += index + 1;
+    resposta += F("\",\"ok\":true,\"recurso\":");
+    resposta += releGetRecursoJSON(index);
+    resposta += '}';
+  }
+
+  resposta += F("]}");
+
+  logaM(LOG_NORMAL, "API setReles: %d recursos", total);
+  server.send(200, "application/json", resposta);
+
+  // Preservar o comportamento atual para comandos externos.
+  if (!fromServer)
+  {
+    for (int i = 0; i < total; i++)
+      releEnviaEvento(indices[i]);
+  }
+}

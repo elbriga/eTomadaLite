@@ -44,6 +44,7 @@ void httpInit()
   server.on("/api/config", HTTP_GET, apiConfig);
 
   server.on("/api/setRele", HTTP_GET, apiReleSet);
+  server.on("/api/setReles", HTTP_GET, apiRelesSet);
   server.on("/api/toggle", HTTP_GET, apiReleToggle);
 
   server.on("/api/reset", HTTP_GET, apiReset);
