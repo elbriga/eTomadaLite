@@ -176,7 +176,7 @@ void apiRelesSet()
 
   String comandos = server.arg("estados");
 
-  if (comandos.isEmpty() || comandos.length() > 80)
+  if (comandos == "" || comandos.length() > 80)
   {
     server.send(400, "application/json",
                 R"({"ok":false,"msg":"invalid estados"})");

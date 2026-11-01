@@ -78,7 +78,7 @@ String eTomadaLiteGetSnapshot()
   resposta += eTomadaLiteDeviceBoard();
 
   resposta += F("\",\"uptime\":");
-  resposta += appUptimeSegundos();
+  resposta += String((unsigned long)appUptimeSegundos());
 
   resposta += F(",\"mac\":\"");
   resposta += WiFi.macAddress();
