@@ -9,6 +9,7 @@
 #include "sensor.h"
 #include "botao.h"
 #include "util.h"
+#include "app.h"
 
 #define ETOMADA_LITE_VERSAO "4.0.2"
 // 0.0.6 - led por TS
@@ -76,7 +77,7 @@ String eTomadaLiteGetSnapshot()
   resposta += eTomadaLiteDeviceBoard();
 
   resposta += F("\",\"uptime\":");
-  resposta += millis();
+  resposta += appUptimeSegundos();
 
   resposta += F(",\"mac\":\"");
   resposta += WiFi.macAddress();

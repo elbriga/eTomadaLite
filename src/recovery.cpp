@@ -495,7 +495,7 @@ static void recoveryHttpInit()
                   resposta += modoAP ? 0 : WiFi.RSSI();
 
                   resposta += F(",\"uptime\":");
-                  resposta += millis();
+                  resposta += millis() / 1000L;
 
                   resposta += F(",\"mac\":\"");
                   resposta += WiFi.macAddress();

@@ -3,6 +3,7 @@
 #include "eTomadaLite.h"
 #include "platform.h"
 #include "loga.h"
+#include "app.h"
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga(".LOGS..", nivel, fmt, ##__VA_ARGS__)
@@ -15,7 +16,7 @@ static LogLevel logLevel = LOG_DEBUG;
 struct LogRemoto
 {
   time_t timestamp;
-  uint32_t uptime; // em segundos -> TODO :: mudar para ms?
+  uint32_t uptime; // em segundos
   int level;
   char modulo[16];
   char message[LOG_MESSAGE_SIZE];
@@ -156,7 +157,7 @@ void logaV(const char *modulo, LogLevel nivel, const char *fmt, va_list args)
   strftime(formattedTime, sizeof(formattedTime), "%d/%m/%Y %H:%M:%S", &timeinfo);
 
   char formattedUptime[32] = {0};
-  uint32_t uptime = millis() / 1000;
+  uint32_t uptime = appUptimeSegundos();
   int dias = uptime / 86400;
   int horas = (uptime % 86400) / 3600;
   int minutos = (uptime % 3600) / 60;

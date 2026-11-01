@@ -93,9 +93,23 @@ void appInit()
   logaM(LOG_NORMAL, "Inicializacao concluida.");
 }
 
+uint64_t appUptimeSegundos()
+{
+  static uint32_t ultimoMs = 0;
+  static uint64_t acumuladoMs = 0;
+
+  uint32_t agora = millis();
+
+  acumuladoMs += (uint32_t)(agora - ultimoMs);
+  ultimoMs = agora;
+
+  return acumuladoMs / 1000ULL;
+}
+
 void appLoop()
 {
   static time_t ultimoSegundo = -1;
+  static time_t ultimo10Seg = -1;
   static time_t ultimaHora = -1;
 
   struct tm timeinfo;
@@ -106,6 +120,13 @@ void appLoop()
   if (ultimoSegundo != timeinfo.tm_sec)
   {
     ultimoSegundo = timeinfo.tm_sec;
+
+    if (ultimo10Seg != timeinfo.tm_sec / 10)
+    {
+      ultimo10Seg = timeinfo.tm_sec / 10;
+
+      appUptimeSegundos();
+    }
 
     sensorDigitalProcessa();
 
