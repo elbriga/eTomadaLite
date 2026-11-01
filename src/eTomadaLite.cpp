@@ -11,7 +11,7 @@
 #include "util.h"
 #include "app.h"
 
-#define ETOMADA_LITE_VERSAO "4.0.2"
+#define ETOMADA_LITE_VERSAO "4.0.3"
 // 0.0.6 - led por TS
 // 0.0.7 - logaM e log remoto
 // 0.0.8 - modularizado
@@ -31,6 +31,7 @@
 // 4.0.0 - DEL mestre > Ave SERVER
 // 4.0.1 - Suporte novo EKAZA3_2
 // 4.0.2 - comandos em lote
+// 4.0.3 - uptime em segundos sem overflow
 
 // Função de log para esta modulo
 #define logaM(nivel, fmt, ...) loga("ETOMADA", nivel, fmt, ##__VA_ARGS__)
